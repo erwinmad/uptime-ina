@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StatusPagesView from '../components/vue/StatusPagesView.vue';
+import { db } from '../lib/db.js';
+
+const cookie = Astro.cookies.get('session');
+let currentUser = null;
+
+if (cookie && cookie.value) {
+  const session = db.prepare('SELECT user_id, expires_at FROM sessions WHERE token = ?').get(cookie.value) as any;
+  if (session && new Date(session.expires_at) > new Date()) {
+    currentUser = db.prepare('SELECT id, email, full_name, role FROM users WHERE id = ?').get(session.user_id);
+  }
+}
+
+if (!currentUser) {
+  return Astro.redirect('/login');
+}
+---
+
+<BaseLayout title="Manajemen Status Pages">
+  <StatusPagesView client:load currentUser={currentUser} />
+</BaseLayout>

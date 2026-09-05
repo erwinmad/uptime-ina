@@ -15,25 +15,25 @@
         </div>
       </div>
 
-      <!-- Navigation Tabs (Pill Structure) -->
-      <nav class="hidden md:flex items-center gap-1 p-1 bg-zinc-100 rounded-xl text-xs font-medium">
-        <a href="/dashboard" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          Monitors
-        </a>
-        <a href="/incidents" class="px-3 py-1 rounded-lg bg-white text-zinc-900 shadow-sm border border-zinc-200/50 transition-colors flex items-center gap-1.5 font-semibold">
-          Insiden
-          <span v-if="activeIncidents.length > 0" class="px-1.5 py-px rounded-full text-[9px] font-bold bg-rose-500 text-white">{{ activeIncidents.length }}</span>
-        </a>
-        <a href="/reports" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          📈 Laporan SLA
-        </a>
-        <a href="/status/main" target="_blank" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          Status Page ↗
-        </a>
-        <a href="/settings" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          ⚙️ Pengaturan
-        </a>
-      </nav>
+        <!-- Navigation Tabs (Pill Structure) -->
+        <nav class="hidden md:flex items-center gap-1 p-1 bg-zinc-100 rounded-xl text-xs font-medium">
+          <a href="/dashboard" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
+            Monitors
+          </a>
+          <a href="/incidents" class="px-3 py-1 rounded-lg bg-white text-zinc-900 shadow-sm border border-zinc-200/50 transition-colors flex items-center gap-1.5 font-semibold">
+            Insiden
+            <span v-if="activeIncidents.length > 0" class="px-1.5 py-px rounded-full text-[9px] font-bold bg-rose-500 text-white">{{ activeIncidents.length }}</span>
+          </a>
+          <a href="/reports" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
+            📈 Laporan SLA
+          </a>
+          <a href="/status-pages" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
+            🌐 Status Pages
+          </a>
+          <a href="/settings" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
+            ⚙️ Pengaturan
+          </a>
+        </nav>
 
       <div class="flex items-center gap-2">
         <button class="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-[0.98]" @click="isCreateModalOpen = true">

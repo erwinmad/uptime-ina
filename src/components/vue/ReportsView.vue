@@ -26,8 +26,8 @@
           <a href="/reports" class="px-3 py-1 rounded-lg bg-white text-zinc-900 shadow-sm border border-zinc-200/50 transition-colors font-semibold">
             📈 Laporan SLA
           </a>
-          <a href="/status/main" target="_blank" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-            Status Page ↗
+          <a href="/status-pages" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
+            🌐 Status Pages
           </a>
           <a href="/settings" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
             ⚙️ Pengaturan
