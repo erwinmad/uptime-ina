@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Dashboard from '../components/vue/Dashboard.vue';
+import { validateSession } from '../lib/db.js';
+
+const token = Astro.cookies.get('sentinel_session')?.value;
+const session = token ? validateSession(token) : null;
+
+if (!session) {
+  return Astro.redirect('/login');
+}
+---
+
+<BaseLayout title="Dashboard & Live Monitors">
+  <main>
+    <Dashboard client:load currentUser={session.user} />
+  </main>
+</BaseLayout>
+

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SettingsView from '../components/vue/SettingsView.vue';
+import { validateSession } from '../lib/db.js';
+
+const token = Astro.cookies.get('sentinel_session')?.value;
+const session = token ? validateSession(token) : null;
+
+if (!session) {
+  return Astro.redirect('/login');
+}
+---
+
+<BaseLayout title="Pengaturan & Integrasi">
+  <main>
+    <SettingsView client:load currentUser={session.user} />
+  </main>
+</BaseLayout>
+

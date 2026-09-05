@@ -1,0 +1,35 @@
+{
+  "name": "uptime-cjr",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=server.js --packages=external --external:./dist/server/entry.mjs",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "@astrojs/node": "^11.1.5",
+    "@astrojs/vue": "^7.0.2",
+    "astro": "^7.3.1",
+    "better-sqlite3": "^13.0.3",
+    "lucide-vue-next": "^1.0.0",
+    "nanoid": "^6.0.1",
+    "sirv": "^3.0.2",
+    "vue": "^3.5.42",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.4.1",
+    "@types/ws": "^8.18.1",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}
