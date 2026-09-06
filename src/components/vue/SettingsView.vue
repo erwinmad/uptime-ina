@@ -2,124 +2,102 @@
   <div class="relative min-h-[100dvh] text-zinc-900 bg-[#FAFAFA] flex flex-col selection:bg-zinc-200">
     <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-4 flex-1">
     <!-- Top Floating Navigation Bar -->
-    <header class="flex items-center justify-between gap-3 p-2.5 pl-4 pr-3 bg-white ring-1 ring-zinc-200/80 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-      <!-- Brand Lockup -->
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-zinc-100 ring-1 ring-zinc-200 flex items-center justify-center text-sm shrink-0">
-          <img v-if="isImageLogo(brandingForm.logo_icon)" :src="brandingForm.logo_icon" alt="Logo" class="w-4 h-4 object-contain rounded-full" />
-          <span v-else>{{ brandingForm.logo_icon || '🌐' }}</span>
-        </div>
-        <div class="flex items-baseline gap-2">
-          <h1 class="text-sm font-bold text-zinc-900 tracking-tight">{{ brandingForm.app_name || 'Uptime CJR' }}</h1>
-          <span class="hidden xl:inline text-[11px] text-zinc-400 font-mono truncate max-w-xs">| Pengaturan Sistem</span>
-        </div>
-      </div>
+        <!-- App Navbar -->
+    <AppNavbar 
+      :current-user="props.currentUser" 
+      active-tab="settings" 
+      :subtitle="`| ${t('settings.title')}`"
+    >
+    </AppNavbar>
 
-      <!-- Navigation Tabs (Pill Structure) -->
-      <nav class="hidden md:flex items-center gap-1 p-1 bg-zinc-100 rounded-xl text-xs font-medium">
-        <a href="/dashboard" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          Monitors
-        </a>
-        <a href="/incidents" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          Insiden
-        </a>
-        <a href="/reports" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          📈 Laporan SLA
-        </a>
-        <a href="/status-pages" class="px-3 py-1 rounded-lg text-zinc-600 hover:text-zinc-900 transition-colors">
-          🌐 Status Pages
-        </a>
-        <a href="/settings" class="px-3 py-1 rounded-lg bg-white text-zinc-900 shadow-sm border border-zinc-200/50 transition-colors font-semibold">
-          ⚙️ Pengaturan
-        </a>
-      </nav>
-
-      <!-- User Profile & Logout -->
-      <div v-if="props.currentUser" class="flex items-center gap-2 pl-2 border-l border-zinc-200 shrink-0">
-        <div class="w-7 h-7 rounded-full bg-zinc-100 ring-1 ring-zinc-200 text-zinc-700 flex items-center justify-center font-bold text-xs" :title="props.currentUser.email">
-          {{ (props.currentUser.full_name || props.currentUser.email || 'A')[0].toUpperCase() }}
-        </div>
-        <button 
-          @click="handleLogout"
-          title="Keluar dari sistem"
-          class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-rose-50 hover:text-rose-600 text-zinc-600 text-[11px] transition-colors border border-zinc-200 cursor-pointer"
-        >
-          Keluar
-        </button>
+    <!-- Language Selector Bar -->
+    <div class="flex items-center justify-between p-2 bg-white ring-1 ring-zinc-200/80 rounded-2xl shadow-xs">
+      <div class="flex items-center gap-2 text-xs">
+        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+        <span class="font-semibold text-zinc-900">{{ t('settings.language') }}</span>
+        <span class="text-zinc-400 hidden sm:inline">— {{ t('settings.languageDesc') }}</span>
       </div>
-    </header>
+      <LanguageSwitcher />
+    </div>
 
     <!-- Compact Segmented Tabs Navigation -->
     <div class="flex items-center gap-1 p-1.5 bg-white ring-1 ring-zinc-200/80 rounded-2xl overflow-x-auto text-xs font-medium shadow-xs">
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'branding' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'branding'"
       >
-        🎨 Branding
+        <Palette class="w-3.5 h-3.5" /> {{ t('settings.branding') }}
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
-        :class="currentTab === 'status-pages' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
-        @click="currentTab = 'status-pages'"
-      >
-        🌐 Status Pages
-      </button>
-      <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'channels' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'channels'"
       >
-        🔔 Saluran Notifikasi
+        <Bell class="w-3.5 h-3.5" /> {{ t('settings.notifications') }}
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'escalation' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'escalation'"
       >
-        ⚡ Eskalasi
+        <Zap class="w-3.5 h-3.5" /> {{ t('settings.escalation') }}
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'on-call' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'on-call'"
       >
-        🧑‍💻 On-Call
+        <Headset class="w-3.5 h-3.5" /> {{ t('settings.oncall') }}
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'maintenance' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'maintenance'"
       >
-        🔧 Maintenance
+        <Wrench class="w-3.5 h-3.5" /> {{ t('settings.maintenance') }}
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'nodes' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'nodes'"
       >
-        🛰️ Probe Nodes
+        <Satellite class="w-3.5 h-3.5" /> {{ t('settings.probeNodes') }}
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'security' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'security'"
       >
-        🔒 Keamanan &amp; Akun
+        <Shield class="w-3.5 h-3.5" /> {{ t('settings.security') }} &amp; Akun
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'api-keys' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'api-keys'"
       >
-        🔑 API Keys
+        <KeyRound class="w-3.5 h-3.5" /> {{ t('settings.apiKeys') }}
       </button>
       <button 
-        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium"
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
         :class="currentTab === 'backup' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
         @click="currentTab = 'backup'"
       >
-        💾 Backup &amp; Migrasi
+        <HardDrive class="w-3.5 h-3.5" /> {{ t('settings.backup') }}
+      </button>
+      <button 
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
+        :class="currentTab === 'migrasi' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
+        @click="currentTab = 'migrasi'"
+      >
+        <Package class="w-3.5 h-3.5" /> {{ t('settings.migration') }}
+      </button>
+      <button 
+        class="px-3 py-1.5 rounded-xl transition-all whitespace-nowrap font-medium inline-flex items-center gap-1.5"
+        :class="currentTab === 'autosync' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'"
+        @click="currentTab = 'autosync'"
+      >
+        <RefreshCw class="w-3.5 h-3.5" /> {{ t('settings.autosync') }} Endpoint
       </button>
     </div>
 
@@ -140,18 +118,18 @@
         <!-- Kolom Kiri: Form -->
         <div class="lg:col-span-7 bg-white border border-zinc-200 rounded-xl p-5 space-y-4">
           <div class="border-b border-zinc-200 pb-3">
-            <h3 class="text-sm font-semibold text-zinc-900">⚙️ Konfigurasi Identitas</h3>
+            <h3 class="text-sm font-semibold text-zinc-900 inline-flex items-center gap-1.5"><Settings class="w-4 h-4" /> {{ t('settings.brandingForm.identityTitle') }}</h3>
           </div>
 
           <!-- Template Preset Cepat -->
           <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2">
-            <span class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">Pilihan Template Siap Pakai:</span>
+            <span class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">{{ t('settings.brandingForm.templateLabel') }}</span>
             <div class="flex flex-wrap gap-2">
               <button type="button" class="px-2.5 py-1 text-xs rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-700 border border-zinc-300 transition-colors" @click="applyPreset('cjr')">
                 🌐 Uptime CJR (Diskominfo)
               </button>
               <button type="button" class="px-2.5 py-1 text-xs rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-700 border border-zinc-300 transition-colors" @click="applyPreset('sentinel')">
-                🛡️ SentinelUp (Default)
+                <ShieldCheck class="w-3.5 h-3.5" /> SentinelUp (Default)
               </button>
               <button type="button" class="px-2.5 py-1 text-xs rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-700 border border-zinc-300 transition-colors" @click="applyPreset('cloud')">
                 ⚡ CloudOps Monitor
@@ -162,38 +140,38 @@
           <form @submit.prevent="saveBranding" class="space-y-4">
             <!-- Nama Aplikasi -->
             <div class="space-y-1">
-              <label class="block text-xs font-medium text-zinc-600">Nama Aplikasi (App Name)</label>
+              <label class="block text-xs font-medium text-zinc-600">{{ t('settings.brandingForm.appNameLabel') }}</label>
               <input 
                 v-model="brandingForm.app_name" 
                 class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 focus:bg-white" 
-                placeholder="Contoh: Uptime CJR" 
+                :placeholder="t('settings.brandingForm.appNamePlaceholder')" 
                 required 
               />
-              <span class="block text-[11px] text-zinc-400">Nama ini akan tampil di navbar, judul tab browser, status page, dan notifikasi.</span>
+              <span class="block text-[11px] text-zinc-400">{{ t('settings.brandingForm.appNameDesc') }}</span>
             </div>
 
             <!-- Slogan / Tagline -->
             <div class="space-y-1">
-              <label class="block text-xs font-medium text-zinc-600">Slogan / Tagline Aplikasi</label>
+              <label class="block text-xs font-medium text-zinc-600">{{ t('settings.brandingForm.taglineLabel') }}</label>
               <input 
                 v-model="brandingForm.app_tagline" 
                 class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 focus:bg-white" 
-                placeholder="Contoh: Sistem Pemantauan Ketersediaan Layanan &amp; Infrastruktur" 
+                :placeholder="t('settings.brandingForm.taglinePlaceholder')" 
               />
-              <span class="block text-[11px] text-zinc-400">Deskripsi singkat di bawah nama aplikasi pada header.</span>
+              <span class="block text-[11px] text-zinc-400">{{ t('settings.brandingForm.taglineDesc') }}</span>
             </div>
 
             <!-- Logo / Ikon -->
             <div class="space-y-1">
-              <label class="block text-xs font-medium text-zinc-600">Logo / Ikon Aplikasi</label>
+              <label class="block text-xs font-medium text-zinc-600">{{ t('settings.brandingForm.logoLabel') }}</label>
               <input 
                 v-model="brandingForm.logo_icon" 
                 class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 focus:bg-white" 
-                placeholder="Ketik Emoji (e.g. 🌐, 🛡️, ⚡) atau URL Gambar (https://.../logo.png)" 
+                :placeholder="t('settings.brandingForm.logoPlaceholder')" 
                 required 
               />
               <div class="flex items-center gap-1.5 pt-1">
-                <span class="text-[11px] text-zinc-400">Pilih Ikon Cepat:</span>
+                <span class="text-[11px] text-zinc-400">{{ t('settings.brandingForm.quickIcon') }}</span>
                 <button 
                   v-for="em in ['🌐', '🛡️', '⚡', '📡', '🏢', '🚀', '💻', '🔒', '📊']" 
                   :key="em" 
@@ -204,36 +182,36 @@
                   {{ em }}
                 </button>
               </div>
-              <span class="block text-[11px] text-zinc-400">Dapat berupa emoji tunggal ATAU tautan URL gambar (PNG, SVG, JPG, WebP).</span>
+              <span class="block text-[11px] text-zinc-400">{{ t('settings.brandingForm.logoDesc') }}</span>
             </div>
 
             <!-- Favicon URL -->
             <div class="space-y-1">
-              <label class="block text-xs font-medium text-zinc-600">URL Favicon Kustom (Opsional)</label>
+              <label class="block text-xs font-medium text-zinc-600">{{ t('settings.brandingForm.faviconLabel') }}</label>
               <input 
                 v-model="brandingForm.favicon_url" 
                 class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 focus:bg-white font-mono text-xs" 
-                placeholder="https://contoh.id/favicon.ico atau biarkan kosong" 
+                :placeholder="t('settings.brandingForm.faviconPlaceholder')" 
               />
-              <span class="block text-[11px] text-zinc-400">Jika dikosongkan, favicon otomatis digenerate dari logo/emoji di atas.</span>
+              <span class="block text-[11px] text-zinc-400">{{ t('settings.brandingForm.faviconDesc') }}</span>
             </div>
 
             <!-- Teks Footer -->
             <div class="space-y-1">
-              <label class="block text-xs font-medium text-zinc-600">Teks Footer &amp; Hak Cipta</label>
+              <label class="block text-xs font-medium text-zinc-600">{{ t('settings.brandingForm.footerLabel') }}</label>
               <textarea 
                 v-model="brandingForm.footer_text" 
                 class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 focus:bg-white" 
                 rows="2" 
-                placeholder="Contoh: © 2026 Uptime CJR — Dinas Komunikasi dan Informatika Kab. Cianjur"
+                :placeholder="t('settings.brandingForm.footerPlaceholder')"
               ></textarea>
               <span class="block text-[11px] text-zinc-400">Teks hak cipta / atribusi di bagian bawah seluruh halaman.</span>
             </div>
 
             <!-- Action Buttons -->
             <div class="flex items-center gap-3 pt-3 border-t border-zinc-200">
-              <button type="submit" class="px-4 py-2 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm" :disabled="isSaving">
-                {{ isSaving ? '⏳ Menyimpan...' : '💾 Simpan Perubahan Branding' }}
+              <button type="submit" class="px-4 py-2 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm inline-flex items-center gap-1.5" :disabled="isSaving">
+                <Save class="w-3.5 h-3.5" /> {{ isSaving ? 'Menyimpan...' : 'Simpan Perubahan Branding' }}
               </button>
               <button type="button" class="px-4 py-2 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 border border-zinc-300 transition-colors" @click="resetBrandingDefaults">
                 ↺ Reset ke Default
@@ -244,8 +222,8 @@
 
         <!-- Kolom Kanan: Live Preview -->
         <div class="lg:col-span-5 space-y-4">
-          <div class="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-            <span>👁️ Pratinjau Tampilan Langsung (Live Preview)</span>
+          <div class="text-xs font-semibold text-zinc-500 uppercase tracking-wider inline-flex items-center gap-1.5">
+            <Eye class="w-3.5 h-3.5" /> Pratinjau Tampilan Langsung (Live Preview)
           </div>
 
           <!-- Preview Header -->
@@ -254,12 +232,12 @@
             <div class="flex items-center justify-between p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
               <div class="flex items-center gap-2.5">
                 <div class="flex items-center justify-center text-xl">
-                  <img v-if="isImageLogo(brandingForm.logo_icon)" :src="brandingForm.logo_icon" alt="Logo" class="w-6 h-6 object-contain rounded" />
-                  <span v-else>{{ brandingForm.logo_icon || '🌐' }}</span>
+                  <img v-if="isImageLogo(brandingForm?.logo_icon)" :src="brandingForm?.logo_icon" alt="Logo" class="w-6 h-6 object-contain rounded" />
+                  <span v-else>{{ brandingForm?.logo_icon || '🌐' }}</span>
                 </div>
                 <div>
-                  <div class="text-xs font-bold text-zinc-900">{{ brandingForm.app_name || 'Uptime CJR' }}</div>
-                  <div class="text-[10px] text-zinc-500 truncate max-w-[160px]">{{ brandingForm.app_tagline || 'Pemantauan Layanan' }}</div>
+                  <div class="text-xs font-bold text-zinc-900">{{ brandingForm?.app_name || 'Uptime CJR' }}</div>
+                  <div class="text-[10px] text-zinc-500 truncate max-w-[160px]">{{ brandingForm?.app_tagline || 'Pemantauan Layanan' }}</div>
                 </div>
               </div>
               <div class="flex gap-1 text-[11px]">
@@ -274,10 +252,10 @@
             <span class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">Tab Browser:</span>
             <div class="flex items-center gap-2 p-2 bg-zinc-50 border border-zinc-200 rounded-t-lg max-w-xs">
               <div class="text-xs flex items-center justify-center">
-                <img v-if="brandingForm.favicon_url && isImageLogo(brandingForm.favicon_url)" :src="brandingForm.favicon_url" class="w-4 h-4 rounded" />
-                <span v-else>{{ brandingForm.logo_icon || '🌐' }}</span>
+                <img v-if="brandingForm?.favicon_url && isImageLogo(brandingForm?.favicon_url)" :src="brandingForm?.favicon_url" class="w-4 h-4 rounded" />
+                <span v-else>{{ brandingForm?.logo_icon || '🌐' }}</span>
               </div>
-              <span class="text-xs text-zinc-700 truncate flex-1">{{ brandingForm.app_name || 'Uptime CJR' }} — Dashboard</span>
+              <span class="text-xs text-zinc-700 truncate flex-1">{{ brandingForm?.app_name || 'Uptime CJR' }} — Dashboard</span>
               <span class="text-zinc-400 text-xs">&times;</span>
             </div>
           </div>
@@ -286,7 +264,7 @@
           <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-2">
             <span class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">Footer Halaman:</span>
             <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-lg text-center text-xs text-zinc-500">
-              <p>{{ brandingForm.footer_text || '© 2026 Uptime CJR — Pemantauan Layanan' }}</p>
+              <p>{{ brandingForm?.footer_text || '© 2026 Uptime CJR — Pemantauan Layanan' }}</p>
             </div>
           </div>
         </div>
@@ -301,24 +279,24 @@
           <p class="text-xs text-zinc-500 mt-0.5">Kirimkan notifikasi instan saat terjadi downtime atau pemulihan ke tim Anda.</p>
         </div>
         <button class="px-3.5 py-2 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm" @click="isChannelModalOpen = true">
-          + Tambah Saluran
+          {{ t('settings.addChannel') }}
         </button>
       </div>
 
       <div v-if="channels.length === 0" class="p-8 text-center bg-white border border-zinc-200 rounded-xl">
-        <p class="text-xs text-zinc-500">Belum ada saluran notifikasi yang dikonfigurasi.</p>
-        <button class="mt-3 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isChannelModalOpen = true">
+        <p class="text-xs text-zinc-500">{{ t('settings.channelsEmpty') }}</p>
+        <button class="mt-3 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isChannelModalOpen = true">
           + Tambah Telegram / Discord / Webhook
         </button>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div v-for="c in channels" :key="c.id" class="flex items-center gap-3 p-4 bg-white border border-zinc-200 rounded-xl">
-          <div class="text-2xl">
-            <span v-if="c.type === 'telegram'">✈️</span>
-            <span v-else-if="c.type === 'discord'">🎮</span>
-            <span v-else-if="c.type === 'slack'">💬</span>
-            <span v-else>🌐</span>
+          <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center">
+            <Send v-if="c.type === 'telegram'" class="w-4 h-4 text-sky-500" />
+            <Gamepad2 v-else-if="c.type === 'discord'" class="w-4 h-4 text-indigo-500" />
+            <MessageCircle v-else-if="c.type === 'slack'" class="w-4 h-4 text-emerald-500" />
+            <Globe v-else class="w-4 h-4 text-zinc-500" />
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
@@ -331,9 +309,7 @@
               {{ c.type === 'telegram' ? 'Chat ID: ' + (c.config.chatId || '***') : (c.config.url || c.config.webhookUrl || 'Configured') }}
             </p>
           </div>
-          <button class="px-2.5 py-1 text-xs rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteChannel(c.id)">
-            Hapus
-          </button>
+          <button class="px-2.5 py-1 text-xs rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteChannel(c.id)">{{ t('settings.delete') }}</button>
         </div>
       </div>
     </section>
@@ -351,18 +327,18 @@
       </div>
 
       <div v-if="newGeneratedKey" class="p-4 bg-emerald-950/60 border border-emerald-500/40 rounded-xl space-y-2">
-        <div class="text-xs font-semibold text-emerald-400">🎉 Key Berhasil Dibuat! Simpan key ini sekarang:</div>
+        <div class="text-xs font-semibold text-emerald-400 inline-flex items-center gap-1.5"><PartyPopper class="w-3.5 h-3.5" /> Key Berhasil Dibuat! Simpan key ini sekarang:</div>
         <div class="flex items-center gap-2 bg-zinc-50 p-2 rounded-lg border border-zinc-200">
           <code class="flex-1 text-xs text-zinc-900 font-mono break-all">{{ newGeneratedKey.raw_key }}</code>
           <button class="px-3 py-1 rounded text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-white shadow-sm text-zinc-900 transition-colors" @click="copyKey(newGeneratedKey.raw_key)">
-            📋 Salin
+            <Copy class="w-3 h-3" /> Salin
           </button>
         </div>
         <p class="text-[11px] text-rose-300">⚠️ Demi keamanan, token ini di-hash dalam database dan tidak akan pernah ditampilkan lagi.</p>
       </div>
 
       <div v-if="apiKeys.length === 0" class="p-8 text-center bg-white border border-zinc-200 rounded-xl">
-        <p class="text-xs text-zinc-500">Belum ada API key yang terdaftar.</p>
+        <p class="text-xs text-zinc-500">{{ t('settings.apiKeysEmpty') }}</p>
       </div>
 
       <div v-else class="space-y-2">
@@ -381,6 +357,87 @@
           </button>
         </div>
       </div>
+
+      <!-- API Documentation -->
+      <div class="mt-8 p-5 bg-white border border-zinc-200 rounded-2xl space-y-4">
+        <div>
+          <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">📚 Dokumentasi API — Uptime CJR</h3>
+          <p class="text-[11px] text-zinc-500 mt-1">Gunakan API Keys di atas untuk autentikasi. Semua endpoint berada di bawah <code class="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 rounded text-[10px] font-mono">/api/v1</code> dengan header <code class="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 rounded text-[10px] font-mono">Authorization: Bearer sk_live_xxx</code></p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
+          <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+            <h4 class="text-xs font-bold text-zinc-900">🔐 Autentikasi</h4>
+            <pre class="bg-zinc-900 text-zinc-100 p-3 rounded-lg text-[10px] font-mono overflow-x-auto">curl -H "Authorization: Bearer sk_live_xxx" \
+  https://yourdomain/api/v1/monitors</pre>
+            <p class="text-[11px] text-zinc-500">Scope yang tersedia: <code>monitors:read</code>, <code>monitors:write</code>, <code>incidents:read</code>, <code>incidents:write</code>, <code>status_pages:manage</code>, <code>notifications:manage</code>, <code>*</code> (full)</p>
+          </div>
+          <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+            <h4 class="text-xs font-bold text-zinc-900 inline-flex items-center gap-1.5"><FileUp class="w-3.5 h-3.5" /> Format JSON — is_active</h4>
+            <pre class="bg-zinc-900 text-zinc-100 p-3 rounded-lg text-[10px] font-mono overflow-x-auto">{
+  "nama_aplikasi": "Portal Cianjur",
+  "url_aplikasi": "https://cianjurkab.go.id",
+  "kategori": "Layanan Utama",
+  "is_active": 1
+  // 1 = aktif (dimonitor)
+  // 0 = nonaktif (di-skip SLA)
+}</pre>
+            <p class="text-[11px] text-zinc-500">Saat sync, jika <code>is_active:0</code> maka monitor dibuat dengan <code>active=0</code> (tidak dihitung SLA/uptime/respons/insiden).</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-zinc-200 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-zinc-50 border-b border-zinc-200">
+              <tr class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                <th class="px-3 py-2">Method</th>
+                <th class="px-3 py-2">Endpoint</th>
+                <th class="px-3 py-2">Scope</th>
+                <th class="px-3 py-2">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-100">
+              <tr><td class="px-3 py-2 font-mono font-bold text-emerald-600">GET</td><td class="px-3 py-2 font-mono">/monitors</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-zinc-100 border rounded text-[10px]">monitors:read</span></td><td class="px-3 py-2">List semua monitor (is_featured selalu di atas)</td></tr>
+              <tr><td class="px-3 py-2 font-mono font-bold text-emerald-600">POST</td><td class="px-3 py-2 font-mono">/monitors</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-zinc-100 border rounded text-[10px]">monitors:write</span></td><td class="px-3 py-2">Buat monitor — default <code>retries_before_down=6</code>, <code>interval=60s</code></td></tr>
+              <tr><td class="px-3 py-2 font-mono font-bold text-amber-600">PATCH</td><td class="px-3 py-2 font-mono">/monitors/:id</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-zinc-100 border rounded text-[10px]">monitors:write</span></td><td class="px-3 py-2">Update monitor / toggle <code>is_featured</code>, <code>active</code>, <code>is_active</code></td></tr>
+              <tr><td class="px-3 py-2 font-mono font-bold text-rose-600">DELETE</td><td class="px-3 py-2 font-mono">/monitors/:id</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-zinc-100 border rounded text-[10px]">monitors:write</span></td><td class="px-3 py-2">Hapus monitor + riwayat</td></tr>
+              <tr><td class="px-3 py-2 font-mono">GET</td><td class="px-3 py-2 font-mono">/reports/sla?range=&sla=</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-zinc-100 border rounded text-[10px]">monitors:read</span></td><td class="px-3 py-2">Laporan SLA (featured di atas, paginated)</td></tr>
+              <tr><td class="px-3 py-2 font-mono">POST</td><td class="px-3 py-2 font-mono">/import/api-sync</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-zinc-100 border rounded text-[10px]">monitors:write</span></td><td class="px-3 py-2">Bulk import via JSON API (is_active sync)</td></tr>
+              <tr><td class="px-3 py-2 font-mono">POST</td><td class="px-3 py-2 font-mono">/import/kuma</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-zinc-100 border rounded text-[10px]">monitors:write</span></td><td class="px-3 py-2">Import Uptime Kuma — interval→3600s, retries→6</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl">
+            <h4 class="text-xs font-bold text-zinc-900">Contoh cURL — Buat Monitor</h4>
+            <pre class="mt-2 bg-zinc-900 text-zinc-100 p-3 rounded-lg text-[10px] font-mono overflow-x-auto">curl -X POST https://yourdomain/api/v1/monitors \
+  -H "Authorization: Bearer sk_live_xxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Portal CJR",
+    "target": "https://cianjurkab.go.id",
+    "type": "http",
+    "is_active": 1,
+    "is_featured": 1,
+    "retries_before_down": 6
+  }'</pre>
+          </div>
+          <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl">
+            <h4 class="text-xs font-bold text-zinc-900">Contoh cURL — Bulk via API Sync</h4>
+            <pre class="mt-2 bg-zinc-900 text-zinc-100 p-3 rounded-lg text-[10px] font-mono overflow-x-auto">curl -X POST https://yourdomain/api/v1/import/api-sync \
+  -H "Authorization: Bearer sk_live_xxx" \
+  -d '{
+    "action": "save",
+    "api_url": "https://csirt.cianjurkab.go.id/api/...",
+    "default_interval_seconds": 3600
+  }'
+// is_active di JSON sumber akan di-sync:
+// is_active:0 → active=0 (diabaikan SLA)
+</pre>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- TAB 3: Maintenance Windows -->
@@ -391,13 +448,13 @@
           <p class="text-xs text-zinc-500 mt-0.5">Jadwalkan pemeliharaan terencana untuk menekan alarm notifikasi tanpa mematikan pencatatan metrik.</p>
         </div>
         <button class="px-3.5 py-2 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm" @click="isMaintModalOpen = true">
-          + Jadwalkan Maintenance
+          {{ t('settings.addMaintenance') }}
         </button>
       </div>
 
       <div v-if="maintenanceWindows.length === 0" class="p-8 text-center bg-white border border-zinc-200 rounded-xl">
-        <p class="text-xs text-zinc-500">Belum ada jadwal maintenance yang terdaftar.</p>
-        <button class="mt-3 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isMaintModalOpen = true">
+        <p class="text-xs text-zinc-500">{{ t('settings.maintenanceEmpty') }}</p>
+        <button class="mt-3 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isMaintModalOpen = true">
           + Buat Jadwal Baru
         </button>
       </div>
@@ -406,11 +463,9 @@
         <div v-for="w in maintenanceWindows" :key="w.id" class="p-4 bg-white border rounded-xl space-y-2" :class="w.is_currently_active ? 'border-amber-500/40 bg-amber-950/20' : 'border-zinc-200'">
           <div class="flex items-center justify-between">
             <span class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase" :class="w.is_currently_active ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-zinc-100 text-zinc-500 border border-zinc-300'">
-              {{ w.is_currently_active ? '🟢 SEDANG AKTIF (ALERTS SUPPRESSED)' : 'UPCOMING / RECORDED' }}
+              {{ w.is_currently_active ? '<span class="inline-flex items-center gap-1.5"><CircleDot class="w-3 h-3 text-emerald-500" /> SEDANG AKTIF (ALERTS SUPPRESSED)</span>' : 'UPCOMING / RECORDED' }}
             </span>
-            <button class="px-2 py-0.5 text-xs rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteMaintenance(w.id)">
-              Hapus
-            </button>
+            <button class="px-2 py-0.5 text-xs rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteMaintenance(w.id)">{{ t('settings.delete') }}</button>
           </div>
           <h3 class="text-sm font-semibold text-zinc-900">{{ w.title }}</h3>
           <p class="text-xs text-zinc-500" v-if="w.description">{{ w.description }}</p>
@@ -458,17 +513,17 @@
     <section v-if="currentTab === 'escalation'" class="space-y-3">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-sm font-semibold text-zinc-900">⚡ Kebijakan Eskalasi Pager & Notifikasi</h2>
+          <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><Zap class="w-4 h-4" /> Kebijakan Eskalasi Pager & Notifikasi</span></h2>
           <p class="text-xs text-zinc-500 mt-0.5">Atur rantai eskalasi berjenjang jika insiden belum terselesaikan dalam durasi tertentu.</p>
         </div>
         <button class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs" @click="isEscModalOpen = true">
-          + Buat Eskalasi
+          {{ t('settings.addEscalation') }}
         </button>
       </div>
 
       <div v-if="escalations.length === 0" class="p-6 text-center bg-white border border-zinc-200 rounded-xl">
-        <p class="text-xs text-zinc-500">Belum ada aturan eskalasi yang dibuat.</p>
-        <button class="mt-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isEscModalOpen = true">
+        <p class="text-xs text-zinc-500">{{ t('settings.escalationEmpty') }}</p>
+        <button class="mt-2.5 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isEscModalOpen = true">
           + Buat Aturan Eskalasi Baru
         </button>
       </div>
@@ -477,12 +532,10 @@
         <div v-for="esc in escalations" :key="esc.id" class="p-3.5 bg-white border border-zinc-200 rounded-xl space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-amber-400 text-sm">⚡</span>
+              <Zap class="w-3.5 h-3.5 text-amber-500" />
               <h3 class="text-xs font-semibold text-zinc-900">{{ esc.name }}</h3>
             </div>
-            <button class="px-2 py-0.5 text-[11px] rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteEscalation(esc.id)">
-              Hapus
-            </button>
+            <button class="px-2 py-0.5 text-[11px] rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteEscalation(esc.id)">{{ t('settings.delete') }}</button>
           </div>
           <div class="text-[11px] text-zinc-500 flex items-center gap-1.5 font-mono">
             <span>⏱️ Jeda Eskalasi:</span>
@@ -508,13 +561,13 @@
           <p class="text-xs text-zinc-500 mt-0.5">Kelola penanggung jawab operasional siaga darurat saat terjadi insiden kritis.</p>
         </div>
         <button class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer" @click="isOnCallModalOpen = true">
-          + Tambah Jadwal On-Call
+          {{ t('settings.addOncall') }}
         </button>
       </div>
 
       <div v-if="onCallSchedules.length === 0" class="p-6 text-center bg-white border border-zinc-200 rounded-xl">
-        <p class="text-xs text-zinc-500">Belum ada jadwal on-call yang dikonfigurasi.</p>
-        <button class="mt-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isOnCallModalOpen = true">
+        <p class="text-xs text-zinc-500">{{ t('settings.oncallEmpty') }}</p>
+        <button class="mt-2.5 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors" @click="isOnCallModalOpen = true">
           + Buat Jadwal Piket Baru
         </button>
       </div>
@@ -526,9 +579,7 @@
               <span class="text-base">📞</span>
               <h3 class="text-xs font-bold text-zinc-900">{{ s.name }}</h3>
             </div>
-            <button class="px-2 py-0.5 text-[11px] rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteOnCall(s.id)">
-              Hapus
-            </button>
+            <button class="px-2 py-0.5 text-[11px] rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors" @click="deleteOnCall(s.id)">{{ t('settings.delete') }}</button>
           </div>
 
           <div class="space-y-1 text-xs">
@@ -557,149 +608,279 @@
       </div>
     </section>
 
-    <!-- TAB: Custom Status Pages -->
-    <section v-if="currentTab === 'status-pages'" class="space-y-3">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-semibold text-zinc-900">🌐 Manajemen Halaman Status Publik &amp; Privat</h2>
-          <p class="text-xs text-zinc-500 mt-0.5">Buat halaman status kustom untuk divisi, aplikasi publik, klien, atau stakeholder tertentu.</p>
-        </div>
-        <button class="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer active:scale-[0.98]" @click="openStatusPageModal()">
-          + Buat Status Page
-        </button>
+
+    <!-- TAB: Autosync Endpoint Internal -->
+    <section v-if="currentTab === 'autosync'" class="space-y-4">
+      <div>
+        <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><RefreshCw class="w-4 h-4" /> Autosync Endpoint Internal</span></h2>
+        <p class="text-xs text-zinc-500 mt-0.5">Sinkronisasi otomatis layanan internal via endpoint API — interval & kategori terstandarisasi.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div v-for="p in statusPages" :key="p.id" class="p-4 bg-white border border-zinc-200 rounded-xl space-y-3">
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-zinc-900">{{ p.title }}</h3>
-                <span v-if="p.slug === 'main'" class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase">
-                  DEFAULT / UTAMA
-                </span>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Kolom Kiri: Form Configurator -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Part 1: API Synchronization -->
+          <div class="p-5 sm:p-6 bg-white border border-zinc-200 rounded-2xl space-y-4">
+            <div class="flex items-center gap-2 border-b border-zinc-100 pb-3">
+              <RefreshCw class="w-5 h-5 text-zinc-700" />
+              <div>
+                <h3 class="text-sm font-bold text-zinc-900">Auto-Sync Endpoint API Eksternal</h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Pantau list aplikasi yang dikembalikan oleh API (Cth: Portal CSIRT / E-Gov). Daftar akan ter-update otomatis sesuai jadwal yang ditentukan.</p>
               </div>
-              <div class="flex items-center gap-1.5 mt-0.5">
-                <code class="text-xs text-zinc-900 font-mono">/status/{{ p.slug }}</code>
-                <button 
-                  @click="copyStatusPageUrl(p.slug)" 
-                  class="text-[10px] text-zinc-500 hover:text-zinc-900 px-1.5 py-0.2 rounded bg-zinc-50 border border-zinc-200 transition-colors cursor-pointer"
-                  title="Salin URL Lengkap"
-                >
-                  📋 Salin
+            </div>
+
+            <div v-if="apiSyncSuccessMsg" class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-mono flex items-start justify-between gap-2">
+              <span>✅ {{ apiSyncSuccessMsg }}</span>
+              <button @click="apiSyncSuccessMsg = ''" class="text-emerald-700 hover:text-emerald-900 text-sm font-bold">&times;</button>
+            </div>
+            <div v-if="apiSyncErrorMsg" class="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-mono flex items-start justify-between gap-2">
+              <span>⚠️ {{ apiSyncErrorMsg }}</span>
+              <button @click="apiSyncErrorMsg = ''" class="text-rose-700 hover:text-rose-900 text-sm font-bold">&times;</button>
+            </div>
+
+            <!-- Standar Format JSON Banner -->
+            <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Standar Format JSON API:</span>
+                <button type="button" @click="copyStandardJson" class="text-[10px] text-zinc-600 hover:text-zinc-900 font-mono font-bold bg-white px-2 py-0.5 rounded border border-zinc-200 cursor-pointer">
+                  <Copy class="w-3 h-3" /> Salin Format
                 </button>
               </div>
+              <pre class="bg-zinc-900 text-zinc-200 p-3 rounded-lg text-[10px] font-mono overflow-x-auto leading-relaxed">{
+  "status": "success",
+  "data": [
+    {
+      "nama_aplikasi": "Portal Cianjur",
+      "url_aplikasi": "https://cianjurkab.go.id",
+      "kategori": "Layanan Utama",
+      "is_active": 1
+    }
+  ]
+}</pre>
             </div>
 
-            <!-- Badges -->
-            <div class="flex items-center gap-1 shrink-0">
-              <span 
-                class="px-1.5 py-0.2 rounded text-[10px] font-semibold uppercase tracking-wider"
-                :class="p.is_public ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-zinc-100 text-zinc-500 border border-zinc-300'"
-              >
-                {{ p.is_public ? 'Publik' : 'Privat' }}
-              </span>
-              <span 
-                v-if="p.is_protected" 
-                class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                title="Dilindungi dengan kata sandi"
-              >
-                🔒 Terkunci
-              </span>
-            </div>
-          </div>
-
-          <p class="text-xs text-zinc-500 line-clamp-2">{{ p.description || 'Tidak ada deskripsi tambahan.' }}</p>
-
-          <div class="p-2 rounded bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs">
-            <span class="text-zinc-500">Cakupan Layanan:</span>
-            <span class="text-zinc-700 font-semibold font-mono">
-              {{ p.monitors_count > 0 ? `${p.monitors_count} Monitor Terpilih` : 'Seluruh Monitor (*)' }}
-            </span>
-          </div>
-
-          <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
-            <div class="flex items-center gap-2">
-              <a 
-                :href="`/status/${p.slug}`" 
-                target="_blank" 
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 transition-colors shadow-sm cursor-pointer"
-              >
-                Buka Halaman ↗
-              </a>
-              <button 
-                @click="openStatusPageModal(p)" 
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-900 transition-colors shadow-sm cursor-pointer"
-              >
-                ⚙️ Konfigurasi
-              </button>
+            <!-- Sync Configurations Loop -->
+            <div v-if="apiIntegrations.length > 0" class="space-y-3">
+              <div v-for="integ in apiIntegrations" :key="integ.id" class="p-4 bg-zinc-50 border border-zinc-200 rounded-xl space-y-3">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="text-xs font-bold text-zinc-900">{{ integ.name }}</h4>
+                    <p class="text-[10px] font-mono text-zinc-500 truncate max-w-[200px] sm:max-w-sm mt-0.5" :title="integ.api_url">{{ integ.api_url }}</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span v-if="integ.auto_sync" class="px-2 py-0.5 text-[9px] uppercase tracking-wider font-bold rounded bg-emerald-100 text-emerald-700">Auto-Sync ON</span>
+                    <span v-else class="px-2 py-0.5 text-[9px] uppercase tracking-wider font-bold rounded bg-zinc-200 text-zinc-600">Manual Only</span>
+                    <button @click="deleteApiIntegration(integ.id)" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg text-xs transition-colors" title="Hapus Integrasi">🗑️</button>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200">
+                  <div class="text-[10px] text-zinc-500 font-mono">
+                    Terakhir Sync: <strong class="text-zinc-900">{{ integ.last_synced_at ? new Date(integ.last_synced_at).toLocaleString('id-ID') : 'Belum Pernah' }}</strong>
+                  </div>
+                  <div class="text-[10px] text-zinc-500 font-mono text-right">
+                    Interval: <strong class="text-zinc-900">{{ Math.round(integ.sync_interval_hours / 24) }} Hari Sekali</strong>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <button 
-              v-if="p.slug !== 'main'"
-              @click="deleteStatusPage(p.id)" 
-              class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-colors cursor-pointer"
-            >
-              Hapus
+            <button v-if="!isCreatingApiSync" @click="isCreatingApiSync = true" class="w-full py-2.5 rounded-xl border border-dashed border-zinc-300 text-xs font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors cursor-pointer">
+              + Tambah Integrasi API Baru
             </button>
-            <span v-else class="text-[10px] text-zinc-400 italic">Halaman status primer</span>
+
+            <form v-if="isCreatingApiSync" @submit.prevent="submitApiSync" class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-3">
+              <div class="space-y-1">
+                <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Label Integrasi</label>
+                <input v-model="apiSyncForm.name" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400" placeholder="e.g. Klaster Layanan Utama Cianjur" required />
+              </div>
+              
+              <div class="space-y-1">
+                <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">URL Endpoint API JSON</label>
+                <input v-model="apiSyncForm.api_url" type="url" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono" placeholder="https://csirt.cianjurkab.go.id/api/v1/klaster-aplikasi/layanan-utama" required />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                  <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Jadwal Auto-Sync</label>
+                  <select v-model="apiSyncForm.sync_interval_hours" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400">
+                    <option :value="24">Setiap Hari (24 Jam)</option>
+                    <option :value="168">Setiap 1 Minggu (7 Hari)</option>
+                    <option :value="720">Setiap 1 Bulan (30 Hari)</option>
+                  </select>
+                </div>
+            <div class="space-y-1">
+              <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Interval Ping Monitor</label>
+              <select v-model="apiSyncForm.default_interval_seconds" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400">
+                <option :value="60">Setiap 1 Menit (60s)</option>
+                <option :value="300">Setiap 5 Menit (300s)</option>
+                <option :value="900">Setiap 15 Menit (900s)</option>
+                <option :value="3600">Setiap 1 Jam (3600s - Default)</option>
+                <option :value="86400">Setiap 1 Hari (86400s)</option>
+              </select>
+            </div>
+              </div>
+
+              <label class="flex items-center gap-2 pt-2 cursor-pointer">
+                <input type="checkbox" v-model="apiSyncForm.auto_sync" class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
+                <span class="text-xs font-semibold text-zinc-700">Aktifkan sinkronisasi latar belakang otomatis</span>
+              </label>
+
+              <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-200">
+                <button type="button" @click="isCreatingApiSync = false" class="px-4 py-2 rounded-xl text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer">Batal</button>
+                <button type="button" @click="previewApiSync" class="px-4 py-2 rounded-xl text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 transition-colors flex items-center gap-1.5 cursor-pointer" :disabled="isTestingApi">
+                  <span v-if="isTestingApi" class="animate-spin text-xs">⌛</span> Test Preview
+                </button>
+                <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm cursor-pointer" :disabled="isSavingApi">
+                  {{ isSavingApi ? 'Menyimpan...' : 'Simpan & Sync Sekarang' }}
+                </button>
+              </div>
+
+              <!-- Preview Table Container -->
+              <div v-if="apiPreviewData" class="mt-4 border border-zinc-200 rounded-xl overflow-hidden bg-white">
+                <div class="bg-zinc-50 px-3 py-2 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                  <span>Preview Data Ditemukan ({{ apiPreviewData.items.length }} entri)</span>
+                  <span class="text-emerald-600 font-mono">Format Valid ✓</span>
+                </div>
+                <div class="max-h-48 overflow-y-auto p-0">
+                  <table class="w-full text-left text-xs">
+                    <tbody class="divide-y divide-zinc-100">
+                      <tr v-for="(itm, idx) in apiPreviewData.items" :key="idx" class="hover:bg-zinc-50">
+                        <td class="p-2"><span class="font-bold text-zinc-900">{{ itm.name }}</span><br/><span class="text-[9px] text-zinc-400 font-mono">{{ itm.target }}</span></td>
+                        <td class="p-2 text-[10px] text-zinc-500">{{ itm.category }}</td>
+                        <td class="p-2 text-right">
+                          <span v-if="itm.status === 'updated'" class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-bold">Update</span>
+                          <span v-else class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold">+ Baru</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Kolom Kanan: Sync Audit History Panel (Span 5) -->
+        <div class="lg:col-span-5">
+          <div class="p-5 sm:p-6 bg-white border border-zinc-200 rounded-2xl space-y-4 sticky top-6">
+            <div class="flex items-center gap-2 border-b border-zinc-100 pb-3">
+              <ScrollText class="w-5 h-5 text-zinc-700" />
+              <div>
+                <h3 class="text-sm font-bold text-zinc-900">Riwayat Log Sinkronisasi</h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Pantau data penambahan & perubahan dari API Sync.</p>
+              </div>
+            </div>
+            
+            <div v-if="syncAuditLogs.length === 0" class="text-xs text-zinc-400 text-center py-8 border border-dashed border-zinc-200 rounded-xl bg-zinc-50">
+              {{ t('settings.autosyncEmpty') }}
+            </div>
+            <div v-else class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+              <div v-for="log in syncAuditLogs" :key="log.id" class="p-3 border border-zinc-200 rounded-xl space-y-2 bg-zinc-50/50 hover:bg-white transition-colors shadow-sm">
+                <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-indigo-50 text-indigo-700 border border-indigo-200">System API</span>
+                    <span class="text-[11px] font-mono font-bold text-zinc-900">{{ new Date(log.created_at).toLocaleString('id-ID', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</span>
+                  </div>
+                  <span class="text-[9px] text-zinc-400 font-mono">ID: {{ log.resource_id }}</span>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono">
+                  <span class="text-zinc-600">Total Valid: <strong class="text-zinc-900">{{ log.metadataParsed?.total || 0 }}</strong></span>
+                  <span class="text-emerald-600 font-bold">+ Baru: {{ log.metadataParsed?.added || 0 }}</span>
+                  <span class="text-amber-600 font-bold">~ Update: {{ log.metadataParsed?.updated || 0 }}</span>
+                  <span class="text-zinc-400">Skip: {{ log.metadataParsed?.skipped || 0 }}</span>
+                </div>
+
+                <!-- List Perubahan Detail -->
+                <div v-if="log.metadataParsed?.items && log.metadataParsed.items.length > 0" class="pt-2 border-t border-zinc-100 mt-1">
+                  <details class="group cursor-pointer">
+                    <summary class="text-[10px] text-indigo-600 font-bold uppercase tracking-wider hover:text-indigo-800 list-none flex items-center gap-1 outline-none">
+                      <span>Lihat Perubahan</span>
+                      <span class="transition group-open:rotate-180">▼</span>
+                    </summary>
+                    <div class="mt-2 max-h-32 overflow-y-auto bg-white border border-zinc-200 rounded-lg p-1.5 shadow-inner">
+                      <div v-for="(i, idx) in log.metadataParsed.items" :key="idx" class="text-[10px] flex items-center justify-between p-1.5 hover:bg-zinc-50 border-b border-zinc-50 last:border-0">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                          <span class="w-1.5 h-1.5 rounded-full shrink-0" :class="i.status === 'added' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                          <span class="font-bold text-zinc-900 truncate">{{ i.name }}</span>
+                          <span class="text-zinc-400 truncate max-w-[120px] sm:max-w-[150px] font-mono hidden sm:inline">{{ i.target }}</span>
+                        </div>
+                        <span class="text-zinc-500 shrink-0 font-medium pl-2">{{ i.category }}</span>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- TAB: Uptime Kuma Import -->
-    <section v-if="currentTab === 'import'" class="space-y-3">
+    <!-- TAB: Migrasi -->
+    <section v-if="currentTab === 'migrasi'" class="space-y-4">
       <div>
-        <h2 class="text-sm font-semibold text-zinc-900">📥 Migrasi & Impor dari Uptime Kuma</h2>
-        <p class="text-xs text-zinc-500 mt-0.5">Unggah atau tempel file backup JSON dari Uptime Kuma untuk mengimpor seluruh monitor secara instan.</p>
+        <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><Package class="w-4 h-4" /> Migrasi Data</span></h2>
+        <p class="text-xs text-zinc-500 mt-0.5">Impor data dari platform monitoring lain seperti Uptime Kuma secara instan.</p>
       </div>
 
-      <div v-if="importSuccessMsg" class="p-3 bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs font-medium flex items-center justify-between">
-        <span>✅ {{ importSuccessMsg }}</span>
-        <button @click="importSuccessMsg = ''" class="text-emerald-400 hover:text-emerald-200 text-sm">&times;</button>
-      </div>
-
-      <div v-if="importErrorMsg" class="p-3 bg-rose-950/60 border border-rose-500/30 text-rose-300 rounded-xl text-xs font-medium flex items-center justify-between">
-        <span>⚠️ {{ importErrorMsg }}</span>
-        <button @click="importErrorMsg = ''" class="text-rose-400 hover:text-rose-200 text-sm">&times;</button>
-      </div>
-
-      <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-zinc-600 mb-1">Pilih File Backup JSON (kuma-backup.json)</label>
-          <input 
-            type="file" 
-            accept=".json,application/json" 
-            @change="handleFileUpload" 
-            class="block w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-zinc-900 file:text-white hover:file:bg-zinc-800 file:cursor-pointer cursor-pointer bg-zinc-50 border border-zinc-200 rounded-lg p-1.5"
-          />
+      <div class="p-5 sm:p-6 bg-white border border-zinc-200 rounded-2xl space-y-4">
+        <div class="flex items-center gap-2 border-b border-zinc-100 pb-3">
+          <FolderUp class="w-5 h-5 text-zinc-700" />
+          <div>
+            <h3 class="text-sm font-bold text-zinc-900">Upload Backup JSON Uptime Kuma</h3>
+            <p class="text-[11px] text-zinc-500 mt-0.5">Impor manual file JSON backup dari dashboard Uptime Kuma Anda.</p>
+          </div>
         </div>
 
-        <div class="relative flex py-1 items-center">
-          <div class="flex-grow border-t border-zinc-200"></div>
-          <span class="flex-shrink mx-2 text-[10px] text-zinc-400 uppercase tracking-wider">Atau Tempel JSON Mentah</span>
-          <div class="flex-grow border-t border-zinc-200"></div>
+        <div v-if="importSuccessMsg" class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-medium flex items-center justify-between">
+          <span>✅ {{ importSuccessMsg }}</span>
+          <button @click="importSuccessMsg = ''" class="text-emerald-700 hover:text-emerald-900 text-sm font-bold">&times;</button>
         </div>
 
-        <div>
-          <textarea 
-            v-model="importJsonText" 
-            rows="6" 
-            class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs font-mono text-zinc-700 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-            placeholder='[ { "name": "Google", "type": "http", "url": "https://google.com", "interval": 60 } ]'
-          ></textarea>
+        <div v-if="importErrorMsg" class="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-medium flex items-center justify-between">
+          <span>⚠️ {{ importErrorMsg }}</span>
+          <button @click="importErrorMsg = ''" class="text-rose-700 hover:text-rose-900 text-sm font-bold">&times;</button>
         </div>
 
-        <div class="flex justify-end">
-          <button 
-            type="button" 
-            :disabled="isImporting || !importJsonText.trim()"
-            @click="executeKumaImport" 
-            class="px-4 py-2 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-xs"
-          >
-            {{ isImporting ? '⏳ Mengimpor Monitor...' : '🚀 Mulai Impor Monitor' }}
-          </button>
+        <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-3">
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-1">Pilih File Backup JSON (kuma-backup.json)</label>
+            <input 
+              type="file" 
+              accept=".json,application/json" 
+              @change="handleFileUpload" 
+              class="block w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:font-medium file:bg-zinc-900 file:text-white hover:file:bg-zinc-800 cursor-pointer bg-white border border-zinc-200 rounded-lg p-1.5"
+            />
+          </div>
+
+          <div class="relative flex py-1 items-center">
+            <div class="flex-grow border-t border-zinc-200"></div>
+            <span class="flex-shrink mx-2 text-[10px] text-zinc-400 uppercase tracking-wider">Atau Tempel JSON Mentah</span>
+            <div class="flex-grow border-t border-zinc-200"></div>
+          </div>
+
+          <div>
+            <textarea 
+              v-model="rawKumaJson" 
+              rows="3" 
+              placeholder="Tempel isi JSON backup Uptime Kuma di sini..."
+              class="w-full bg-white border border-zinc-200 rounded-lg p-2 text-xs text-zinc-900 placeholder-zinc-400 font-mono focus:outline-none focus:ring-1 focus:ring-zinc-400"
+            ></textarea>
+          </div>
+
+          <div class="flex justify-end pt-1">
+            <button 
+              type="button" 
+              @click="submitKumaImport" 
+              :disabled="isImporting"
+              class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm cursor-pointer"
+            >
+              {{ isImporting ? 'Mengimpor Data...' : 'Mulai Impor Uptime Kuma' }}
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -707,7 +888,7 @@
     <!-- TAB: Keamanan & Akun -->
     <section v-if="currentTab === 'security'" class="space-y-3">
       <div>
-        <h2 class="text-sm font-semibold text-zinc-900">🔒 Keamanan Akun & Akses</h2>
+        <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><Shield class="w-4 h-4" /> Keamanan Akun & Akses</span></h2>
         <p class="text-xs text-zinc-500 mt-0.5">Kelola kata sandi akun operator administrator SentinelUp.</p>
       </div>
 
@@ -721,69 +902,141 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Password Form -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-3">
-          <h3 class="text-xs font-semibold text-zinc-900 uppercase tracking-wider">Ganti Kata Sandi</h3>
-          <form @submit.prevent="submitPasswordChange" class="space-y-2.5">
-            <div>
-              <label class="block text-xs font-medium text-zinc-500 mb-1">Kata Sandi Saat Ini</label>
-              <input 
-                v-model="pwdForm.oldPassword" 
-                type="password" 
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-1.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400" 
-                required 
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-zinc-500 mb-1">Kata Sandi Baru</label>
-              <input 
-                v-model="pwdForm.newPassword" 
-                type="password" 
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-1.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400" 
-                placeholder="Minimal 8 karakter"
-                required 
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-zinc-500 mb-1">Konfirmasi Kata Sandi Baru</label>
-              <input 
-                v-model="pwdForm.confirmPassword" 
-                type="password" 
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-1.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400" 
-                required 
-              />
-            </div>
-            <div class="pt-1">
-              <button 
-                type="submit" 
-                :disabled="isUpdatingPwd"
-                class="w-full py-2 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors shadow-xs"
-              >
-                {{ isUpdatingPwd ? '⏳ Menyimpan...' : '🔐 Perbarui Kata Sandi' }}
-              </button>
-            </div>
-          </form>
+        <div class="space-y-4">
+          <!-- Password Form -->
+          <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-3">
+            <h3 class="text-xs font-semibold text-zinc-900 uppercase tracking-wider">Ganti Kata Sandi</h3>
+            <form @submit.prevent="submitPasswordChange" class="space-y-2.5">
+              <div>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Kata Sandi Saat Ini</label>
+                <input 
+                  v-model="pwdForm.oldPassword" 
+                  type="password" 
+                  class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white" 
+                  required 
+                />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Kata Sandi Baru</label>
+                <input 
+                  v-model="pwdForm.newPassword" 
+                  type="password" 
+                  class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white" 
+                  placeholder="Minimal 8 karakter"
+                  required 
+                />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Konfirmasi Kata Sandi Baru</label>
+                <input 
+                  v-model="pwdForm.confirmPassword" 
+                  type="password" 
+                  class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white" 
+                  required 
+                />
+              </div>
+              <div class="pt-1">
+                <button 
+                  type="submit" 
+                  :disabled="isUpdatingPwd"
+                  class="w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors shadow-sm"
+                >
+                  {{ isUpdatingPwd ? 'Menyimpan...' : 'Perbarui Kata Sandi' }}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
-        <!-- Security Info Card -->
-        <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-3">
-          <h3 class="text-xs font-semibold text-zinc-900 uppercase tracking-wider">Status Keamanan Sistem</h3>
-          <div class="space-y-2 text-xs">
-            <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200">
-              <span class="text-zinc-500">Akun Aktif:</span>
-              <span class="font-mono text-zinc-700">{{ props.currentUser?.email || 'admin@cjr.go.id' }}</span>
+        <div class="space-y-4">
+          <!-- 2FA Setup Card -->
+          <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-semibold text-zinc-900 uppercase tracking-wider">Autentikasi Dua Faktor (2FA)</h3>
+              <span 
+                class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+                :class="twoFactor.isEnabled ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-zinc-100 text-zinc-500 border border-zinc-200'"
+              >
+                {{ twoFactor.isEnabled ? t('common.active') : t('common.inactive') }}
+              </span>
             </div>
-            <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200">
-              <span class="text-zinc-500">Peran / Role:</span>
-              <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase">Superadmin</span>
+            
+            <p class="text-[11px] text-zinc-500 leading-relaxed">
+              Tingkatkan keamanan akun Anda dengan menambahkan langkah verifikasi kedua menggunakan aplikasi Authenticator (Google Authenticator, Authy, dsb).
+            </p>
+
+            <div v-if="!twoFactor.isEnabled">
+              <div v-if="twoFactor.qrCodeUrl" class="space-y-4 mt-4">
+                <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex flex-col items-center justify-center space-y-3">
+                  <span class="text-[10px] font-bold text-zinc-600 uppercase tracking-wider text-center">Scan QR Code ini</span>
+                  <img :src="twoFactor.qrCodeUrl" alt="2FA QR Code" class="w-32 h-32 rounded-lg bg-white p-1 ring-1 ring-zinc-200" />
+                  <code class="text-[10px] text-zinc-500 font-mono tracking-widest break-all text-center">{{ twoFactor.secret }}</code>
+                </div>
+
+                <form @submit.prevent="verifyAndEnable2FA" class="space-y-2">
+                  <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Masukkan Kode 6-Digit</label>
+                  <div class="flex items-center gap-2">
+                    <input 
+                      v-model="twoFactor.code" 
+                      type="text" 
+                      maxlength="6"
+                      placeholder="123456"
+                      class="flex-1 bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-sm font-mono tracking-widest text-center text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white"
+                      required 
+                    />
+                    <button type="submit" :disabled="isVerifying2FA" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                      Verifikasi
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <button v-else @click="init2FASetup" class="w-full mt-3 py-2.5 rounded-xl text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 transition-colors shadow-sm flex items-center justify-center gap-2">
+                <span><ShieldCheck class="w-3.5 h-3.5" /></span> Mulai Konfigurasi 2FA
+              </button>
             </div>
-            <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200">
-              <span class="text-zinc-500">Registrasi Publik:</span>
-              <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">Nonaktif (Anti-Abuse)</span>
+
+            <div v-else class="pt-2">
+              <form @submit.prevent="disable2FA" class="space-y-2 p-3 bg-rose-50/50 border border-rose-100 rounded-xl">
+                <label class="block text-[10px] font-bold text-rose-700 uppercase tracking-wider">Nonaktifkan 2FA</label>
+                <p class="text-[10px] text-rose-600/80 mb-2">Untuk menonaktifkan, masukkan kode dari aplikasi authenticator Anda saat ini.</p>
+                <div class="flex items-center gap-2">
+                  <input 
+                    v-model="twoFactor.code" 
+                    type="text" 
+                    maxlength="6"
+                    placeholder="123456"
+                    class="flex-1 bg-white border border-rose-200 rounded-xl px-4 py-2.5 text-sm font-mono tracking-widest text-center text-rose-900 focus:outline-none focus:ring-1 focus:ring-rose-400"
+                    required 
+                  />
+                  <button type="submit" :disabled="isVerifying2FA" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 disabled:opacity-50 transition-colors shadow-sm shrink-0">
+                    Nonaktifkan
+                  </button>
+                </div>
+              </form>
             </div>
-            <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200">
-              <span class="text-zinc-500">Enkripsi Kredensial:</span>
-              <span class="text-zinc-600 font-mono text-[11px]">Node.js Native Scrypt</span>
+          </div>
+
+          <!-- Security Info Card -->
+          <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-3">
+            <h3 class="text-xs font-semibold text-zinc-900 uppercase tracking-wider">Status Keamanan Sistem</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center justify-between p-2 rounded-xl bg-zinc-50 border border-zinc-200">
+                <span class="text-zinc-500 text-[11px] font-bold">Akun Aktif:</span>
+                <span class="font-mono text-zinc-700 text-[11px]">{{ props.currentUser?.email || 'admin@cjr.go.id' }}</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-zinc-50 border border-zinc-200">
+                <span class="text-zinc-500 text-[11px] font-bold">Peran / Role:</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 uppercase">Superadmin</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-zinc-50 border border-zinc-200">
+                <span class="text-zinc-500 text-[11px] font-bold">Registrasi Publik:</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-50 text-rose-600 border border-rose-200 uppercase">Nonaktif (Anti-Abuse)</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-xl bg-zinc-50 border border-zinc-200">
+                <span class="text-zinc-500 text-[11px] font-bold">Enkripsi Kredensial:</span>
+                <span class="text-zinc-600 font-mono text-[10px]">Node.js Native Scrypt</span>
+              </div>
             </div>
           </div>
         </div>
@@ -855,20 +1108,20 @@
     <section v-if="currentTab === 'probes'" class="space-y-3">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-sm font-semibold text-zinc-900">🛰️ Multi-Region Probe Nodes</h2>
+          <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><Satellite class="w-4 h-4" /> Multi-Region Probe Nodes</span></h2>
           <p class="text-xs text-zinc-500 mt-0.5">Node pemantau terdistribusi lintas lokasi/datacenter untuk mencegah false positive dan mengonfirmasi status uptime.</p>
         </div>
         <button class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer" @click="isProbeModalOpen = true">
-          + Daftarkan Probe Node
+          {{ t('settings.registerProbe') }}
         </button>
       </div>
 
       <div v-if="newProbeSecret" class="p-4 bg-emerald-950/60 border border-emerald-500/40 rounded-xl space-y-2">
-        <div class="text-xs font-semibold text-emerald-400">🎉 Probe Node Baru Berhasil Didaftarkan! Simpan token ini untuk agen:</div>
+        <div class="text-xs font-semibold text-emerald-400"><span class="inline-flex items-center gap-1.5"><PartyPopper class="w-4 h-4" /> Probe Node Baru Berhasil Didaftarkan!</span> Simpan token ini untuk agen:</div>
         <div class="flex items-center gap-2 bg-zinc-50 p-2 rounded-lg border border-zinc-200">
           <code class="flex-1 text-xs text-zinc-900 font-mono break-all">{{ newProbeSecret }}</code>
           <button class="px-3 py-1 rounded text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-white shadow-sm text-zinc-900 transition-colors cursor-pointer" @click="copyText(newProbeSecret)">
-            📋 Salin
+            <Copy class="w-3 h-3" /> Salin
           </button>
         </div>
       </div>
@@ -910,9 +1163,7 @@
               v-if="p.id !== 'prb_primary'"
               @click="deleteProbeNode(p.id)"
               class="px-2 py-0.5 text-[11px] rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors cursor-pointer"
-            >
-              Hapus
-            </button>
+            >{{ t('settings.delete') }}</button>
             <span v-else class="text-[10px] text-zinc-900 font-medium">Node Primer</span>
           </div>
         </div>
@@ -922,7 +1173,7 @@
     <!-- TAB: 1-Click Database Backup & Export -->
     <section v-if="currentTab === 'backup'" class="space-y-3">
       <div>
-        <h2 class="text-sm font-semibold text-zinc-900">💾 Backup Database &amp; Ekspor Konfigurasi</h2>
+        <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><HardDrive class="w-4 h-4" /> Backup Database &amp; Ekspor Konfigurasi</span></h2>
         <p class="text-xs text-zinc-500 mt-0.5">Unduh snapshot database lengkap atau ekspor konfigurasi SentinelUp dalam format JSON untuk arsip dan pemulihan cepat.</p>
       </div>
 
@@ -951,14 +1202,14 @@
             download 
             class="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer"
           >
-            📥 Unduh File Database (.db)
+            <span class="inline-flex items-center gap-1.5"><HardDrive class="w-3.5 h-3.5" /> Unduh File Database (.db)</span>
           </a>
         </div>
 
         <!-- JSON Configuration Export -->
         <div class="p-4 bg-white border border-zinc-200 rounded-xl space-y-3">
           <div class="flex items-center gap-2">
-            <span class="text-xl">📋</span>
+            <Clipboard class="w-5 h-5 text-zinc-700" />
             <div>
               <h3 class="text-xs font-bold text-zinc-900">Ekspor Konfigurasi JSON</h3>
               <p class="text-[11px] text-zinc-500">Ekspor teks JSON seluruh monitor, aturan notifikasi, eskalasi, jadwal on-call, dan halaman status.</p>
@@ -979,7 +1230,7 @@
             download 
             class="w-full inline-flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-100 border border-zinc-200 border border-zinc-300 transition-colors shadow-xs cursor-pointer"
           >
-            📥 Unduh Konfigurasi (JSON)
+            <span class="inline-flex items-center gap-1.5"><FileUp class="w-3.5 h-3.5" /> Unduh Konfigurasi (JSON)</span>
           </a>
         </div>
       </div>
@@ -989,12 +1240,12 @@
     <div v-if="isChannelModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm" @click.self="isChannelModalOpen = false">
       <div class="w-full max-w-md bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-zinc-200 pb-3">
-          <h3 class="text-sm font-semibold text-zinc-900">Tambah Saluran Notifikasi</h3>
+          <h3 class="text-sm font-semibold text-zinc-900">{{ t('settings.channelsForm.addTitle') }}</h3>
           <button class="text-zinc-500 hover:text-zinc-900 text-xl leading-none" @click="isChannelModalOpen = false">&times;</button>
         </div>
         <form @submit.prevent="submitNewChannel" class="space-y-3">
           <div class="space-y-1">
-            <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Tipe Saluran</label>
+            <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">{{ t('settings.channelsForm.typeLabel') }}</label>
             <select v-model="channelForm.type" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400">
               <option value="discord">Discord Webhook</option>
               <option value="telegram">Telegram Bot</option>
@@ -1004,7 +1255,7 @@
           </div>
 
           <div class="space-y-1">
-            <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Nama Saluran</label>
+            <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">{{ t('settings.channelsForm.nameLabel') }}</label>
             <input v-model="channelForm.name" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400" placeholder="e.g. #ops-alerts" required />
           </div>
 
@@ -1036,7 +1287,7 @@
     <div v-if="isKeyModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm" @click.self="isKeyModalOpen = false">
       <div class="w-full max-w-md bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-zinc-200 pb-3">
-          <h3 class="text-sm font-semibold text-zinc-900">Generate Scoped API Key</h3>
+          <h3 class="text-sm font-semibold text-zinc-900">{{ t('settings.apiKeyForm.title') }}</h3>
           <button class="text-zinc-500 hover:text-zinc-900 text-xl leading-none" @click="isKeyModalOpen = false">&times;</button>
         </div>
         <form @submit.prevent="submitNewApiKey" class="space-y-3">
@@ -1075,12 +1326,12 @@
     <div v-if="isMaintModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm" @click.self="isMaintModalOpen = false">
       <div class="w-full max-w-lg bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-zinc-200 pb-3">
-          <h3 class="text-sm font-semibold text-zinc-900">Jadwalkan Maintenance Window</h3>
+          <h3 class="text-sm font-semibold text-zinc-900">{{ t('settings.maintenanceForm.title') }}</h3>
           <button class="text-zinc-500 hover:text-zinc-900 text-xl leading-none" @click="isMaintModalOpen = false">&times;</button>
         </div>
         <form @submit.prevent="submitMaintenance" class="space-y-3">
           <div class="space-y-1">
-            <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Judul Maintenance</label>
+            <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">{{ t('settings.maintenanceForm.nameLabel') }}</label>
             <input v-model="maintForm.title" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400" placeholder="e.g. Core Switch &amp; Database Upgrade" required />
           </div>
 
@@ -1117,7 +1368,7 @@
 
           <div class="flex justify-end gap-2 pt-3 border-t border-zinc-200">
             <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors" @click="isMaintModalOpen = false">Batal</button>
-            <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm">Jadwalkan</button>
+            <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm">{{ t('settings.maintenanceForm.submit') }}</button>
           </div>
         </form>
       </div>
@@ -1127,7 +1378,7 @@
     <div v-if="isEscModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm" @click.self="isEscModalOpen = false">
       <div class="w-full max-w-md bg-white border border-zinc-200 rounded-2xl shadow-2xl p-5 space-y-3">
         <div class="flex items-center justify-between border-b border-zinc-200 pb-2.5">
-          <h3 class="text-sm font-semibold text-zinc-900">Buat Kebijakan Eskalasi</h3>
+          <h3 class="text-sm font-semibold text-zinc-900">{{ t('settings.escalationForm.title') }}</h3>
           <button class="text-zinc-500 hover:text-zinc-900 text-xl leading-none" @click="isEscModalOpen = false">&times;</button>
         </div>
         <form @submit.prevent="submitNewEscalation" class="space-y-3">
@@ -1148,12 +1399,12 @@
                 <input type="checkbox" :value="c.id" v-model="escForm.channel_ids" class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
                 <span>{{ c.name }} ({{ c.type }})</span>
               </label>
-              <div v-if="channels.length === 0" class="text-xs text-zinc-400 italic p-1">Belum ada saluran. Buat saluran notifikasi terlebih dahulu.</div>
+              <div v-if="channels.length === 0" class="text-xs text-zinc-400 italic p-1">{{ t('settings.noChannels') }}</div>
             </div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-zinc-200">
-            <button type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors" @click="isEscModalOpen = false">Batal</button>
+            <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors" @click="isEscModalOpen = false">Batal</button>
             <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs">Simpan</button>
           </div>
         </form>
@@ -1164,7 +1415,7 @@
     <div v-if="isOnCallModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm" @click.self="isOnCallModalOpen = false">
       <div class="w-full max-w-md bg-white border border-zinc-200 rounded-2xl shadow-2xl p-5 space-y-3">
         <div class="flex items-center justify-between border-b border-zinc-200 pb-2.5">
-          <h3 class="text-sm font-semibold text-zinc-900">Tambah Jadwal On-Call</h3>
+          <h3 class="text-sm font-semibold text-zinc-900">{{ t('settings.oncallForm.title') }}</h3>
           <button class="text-zinc-500 hover:text-zinc-900 text-xl leading-none" @click="isOnCallModalOpen = false">&times;</button>
         </div>
         <form @submit.prevent="submitNewOnCall" class="space-y-2.5">
@@ -1207,8 +1458,8 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-zinc-200">
-            <button type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isOnCallModalOpen = false">Batal</button>
-            <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer">Simpan Jadwal</button>
+            <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isOnCallModalOpen = false">Batal</button>
+            <button type="submit" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer">{{ t('settings.oncallForm.submit') }}</button>
           </div>
         </form>
       </div>
@@ -1276,7 +1527,7 @@
           <div class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 space-y-2">
             <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-600">
               <input type="checkbox" v-model="statusPageForm.is_protected" class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
-              <span>🔒 Kunci halaman dengan Kata Sandi (Akses Terbatas)</span>
+              <span><span class="inline-flex items-center gap-1.5"><Lock class="w-3.5 h-3.5" /> Kunci halaman dengan Kata Sandi</span> (Akses Terbatas)</span>
             </label>
             <input 
               v-if="statusPageForm.is_protected"
@@ -1289,7 +1540,7 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-zinc-200">
-            <button type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isStatusPageModalOpen = false">Batal</button>
+            <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isStatusPageModalOpen = false">Batal</button>
             <button type="submit" :disabled="isSavingStatusPage" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors shadow-xs cursor-pointer">
               {{ isSavingStatusPage ? 'Menyimpan...' : 'Simpan Halaman Status' }}
             </button>
@@ -1349,7 +1600,7 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-zinc-200">
-            <button type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isUserModalOpen = false">Batal</button>
+            <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isUserModalOpen = false">Batal</button>
             <button type="submit" :disabled="isSavingUser" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors shadow-xs cursor-pointer">
               {{ isSavingUser ? 'Menyimpan...' : 'Simpan Operator' }}
             </button>
@@ -1362,17 +1613,17 @@
     <div v-if="isProbeModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm" @click.self="isProbeModalOpen = false">
       <div class="w-full max-w-md bg-white border border-zinc-200 rounded-2xl shadow-2xl p-5 space-y-3">
         <div class="flex items-center justify-between border-b border-zinc-200 pb-2.5">
-          <h3 class="text-sm font-semibold text-zinc-900">Daftarkan Probe Node Baru</h3>
+          <h3 class="text-sm font-semibold text-zinc-900">{{ t('settings.probeForm.title') }}</h3>
           <button class="text-zinc-500 hover:text-zinc-900 text-xl leading-none" @click="isProbeModalOpen = false">&times;</button>
         </div>
 
         <form @submit.prevent="submitNewProbe" class="space-y-2.5">
           <div class="space-y-1">
-            <label class="block text-xs font-medium text-zinc-600">Nama Probe Node</label>
+            <label class="block text-xs font-medium text-zinc-600">{{ t('settings.probeForm.nameLabel') }}</label>
             <input 
               v-model="probeForm.name" 
               class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400" 
-              placeholder="e.g. Edge Probe SGP Cloud" 
+              :placeholder="t('settings.probeForm.namePlaceholder')" 
               required 
             />
           </div>
@@ -1388,9 +1639,9 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2 border-t border-zinc-200">
-            <button type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isProbeModalOpen = false">Batal</button>
+            <button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors cursor-pointer" @click="isProbeModalOpen = false">{{ t('settings.probeForm.cancel') }}</button>
             <button type="submit" :disabled="isSavingProbe" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors shadow-xs cursor-pointer">
-              {{ isSavingProbe ? 'Mendaftarkan...' : 'Daftarkan Node' }}
+              {{ isSavingProbe ? t('settings.probeForm.submitting') : t('settings.probeForm.submit') }}
             </button>
           </div>
         </form>
@@ -1420,8 +1671,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { Palette, Bell, Zap, Headset, Wrench, Satellite, Shield, KeyRound, HardDrive, Package, RefreshCw, Settings, Eye, Send, Gamepad2, MessageCircle, Globe, PartyPopper, Copy, Clipboard, CircleDot, FileUp, FolderUp, Lock, Save, Sparkles, ShieldCheck } from 'lucide-vue-next';
+import AppNavbar from './AppNavbar.vue';
+import LanguageSwitcher from './LanguageSwitcher.vue';
 import ConfirmModal from './ConfirmModal.vue';
+import { useI18n } from '../../lib/i18n';
+const { t, locale, setLocale } = useI18n();
+
+function isImageLogo(url) {
+  return typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:image'));
+}
 
 const props = defineProps({
   currentUser: {
@@ -1467,10 +1727,6 @@ const brandingForm = ref({
   favicon_url: ''
 });
 
-function isImageLogo(url) {
-  return typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:image'));
-}
-
 function applyPreset(preset) {
   if (preset === 'cjr') {
     brandingForm.value.app_name = 'Uptime CJR';
@@ -1482,7 +1738,7 @@ function applyPreset(preset) {
     brandingForm.value.app_name = 'SentinelUp';
     brandingForm.value.app_tagline = 'Advanced Uptime & Observability';
     brandingForm.value.footer_text = 'Powered by SentinelUp — High Availability Uptime & Observability';
-    brandingForm.value.logo_icon = '🛡️';
+    brandingForm.value.logo_icon = '<ShieldCheck class="w-3.5 h-3.5" />';
     brandingForm.value.favicon_url = '';
   } else if (preset === 'cloud') {
     brandingForm.value.app_name = 'CloudOps Monitor';
@@ -1618,6 +1874,104 @@ async function fetchAudit() {
     if (res.ok) auditLogs.value = await res.json();
   } catch (err) {
     console.error('Fetch audit error:', err);
+  }
+}
+
+const syncAuditLogs = computed(() => {
+  return (auditLogs.value || [])
+    .filter(a => a.action === 'monitors.api_sync')
+    .map(a => {
+      let parsed = {};
+      try {
+        parsed = JSON.parse(a.metadata || '{}');
+      } catch {}
+      return {
+        ...a,
+        metadataParsed: parsed
+      };
+    });
+});
+
+// 2FA State
+const twoFactor = ref({
+  isEnabled: false,
+  qrCodeUrl: '',
+  secret: '',
+  code: ''
+});
+const isVerifying2FA = ref(false);
+
+async function check2FAStatus() {
+  try {
+    const res = await fetch('/api/v1/auth/2fa');
+    if (res.ok) {
+      const data = await res.json();
+      twoFactor.value.isEnabled = Boolean(data.is_2fa_enabled);
+    }
+  } catch (err) {
+    console.error('Check 2FA status error:', err);
+  }
+}
+
+async function init2FASetup() {
+  try {
+    const res = await fetch('/api/v1/auth/2fa');
+    if (res.ok) {
+      const data = await res.json();
+      twoFactor.value.isEnabled = Boolean(data.is_2fa_enabled);
+      twoFactor.value.qrCodeUrl = data.qr_code;
+      twoFactor.value.secret = data.secret;
+    }
+  } catch (err) {
+    console.error('Init 2FA error:', err);
+  }
+}
+
+async function verifyAndEnable2FA() {
+  isVerifying2FA.value = true;
+  try {
+    const res = await fetch('/api/v1/auth/2fa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'enable', code: twoFactor.value.code })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      twoFactor.value.isEnabled = true;
+      twoFactor.value.qrCodeUrl = '';
+      twoFactor.value.secret = '';
+      twoFactor.value.code = '';
+      alert('✅ 2FA Berhasil Diaktifkan!');
+    } else {
+      alert('❌ ' + (data.error || 'Kode salah.'));
+    }
+  } catch (err) {
+    alert('Gagal memverifikasi 2FA.');
+  } finally {
+    isVerifying2FA.value = false;
+  }
+}
+
+async function disable2FA() {
+  isVerifying2FA.value = true;
+  try {
+    const res = await fetch('/api/v1/auth/2fa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'disable', code: twoFactor.value.code })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      twoFactor.value.isEnabled = false;
+      twoFactor.value.code = '';
+      alert('✅ 2FA Berhasil Dinonaktifkan!');
+    } else {
+      alert('❌ ' + (data.error || 'Kode salah.'));
+    }
+  } catch (err) {
+    alert('Gagal menonaktifkan 2FA.');
+  } finally {
+    isVerifying2FA.value = false;
   }
 }
 
@@ -1858,49 +2212,6 @@ function deleteEscalation(id) {
 
 // Uptime Kuma Import state
 const importJsonText = ref('');
-const isImporting = ref(false);
-const importSuccessMsg = ref('');
-const importErrorMsg = ref('');
-
-function handleFileUpload(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    importJsonText.value = e.target.result;
-  };
-  reader.readAsText(file);
-}
-
-async function executeKumaImport() {
-  importSuccessMsg.value = '';
-  importErrorMsg.value = '';
-  isImporting.value = true;
-  try {
-    const parsed = JSON.parse(importJsonText.value);
-    const res = await fetch('/api/v1/import/kuma', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: parsed })
-    });
-    const result = await res.json();
-    if (res.ok) {
-      importSuccessMsg.value = `Berhasil mengimpor ${result.imported_count} monitor dari Uptime Kuma!`;
-      importJsonText.value = '';
-      fetchMonitors();
-    } else {
-      importErrorMsg.value = result.error || 'Gagal mengimpor monitor';
-    }
-  } catch (err) {
-    importErrorMsg.value = 'Format JSON tidak valid atau gagal diproses: ' + err.message;
-  } finally {
-    isImporting.value = false;
-  }
-}
-
-// Password change state
-const pwdForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' });
-const isUpdatingPwd = ref(false);
 const pwdSuccessMsg = ref('');
 const pwdErrorMsg = ref('');
 
@@ -2287,8 +2598,158 @@ function copyText(str) {
   alert('Disalin ke clipboard:\n' + str);
 }
 
+// Uptime Kuma Import State
+const isImporting = ref(false);
+const rawKumaJson = ref('');
+const importSuccessMsg = ref('');
+const importErrorMsg = ref('');
+
+// API Sync State
+const apiIntegrations = ref([]);
+const isCreatingApiSync = ref(false);
+const isTestingApi = ref(false);
+const isSavingApi = ref(false);
+const apiPreviewData = ref(null);
+const apiSyncSuccessMsg = ref('');
+const apiSyncErrorMsg = ref('');
+const apiSyncForm = ref({
+  name: '',
+  api_url: '',
+  sync_interval_hours: 168,
+  default_interval_seconds: 3600,
+  auto_sync: true
+});
+
+async function fetchApiIntegrations() {
+  try {
+    const res = await fetch('/api/v1/import/api-sync');
+    if (res.ok) {
+      apiIntegrations.value = await res.json();
+    }
+  } catch (e) {
+    console.error('Fetch API integrations error', e);
+  }
+}
+
+async function previewApiSync() {
+  if (!apiSyncForm.value.api_url) {
+    apiSyncErrorMsg.value = 'URL API diperlukan untuk melakukan test fetch.';
+    return;
+  }
+  isTestingApi.value = true;
+  apiPreviewData.value = null;
+  apiSyncErrorMsg.value = '';
+  
+  try {
+    const res = await fetch('/api/v1/import/api-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'preview', api_url: apiSyncForm.value.api_url })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      apiPreviewData.value = data;
+    } else {
+      apiSyncErrorMsg.value = data.error || 'Gagal mengambil data dari API.';
+    }
+  } catch (err) {
+    apiSyncErrorMsg.value = 'Terjadi kesalahan jaringan saat test fetch.';
+  } finally {
+    isTestingApi.value = false;
+  }
+}
+
+async function submitApiSync() {
+  if (!apiSyncForm.value.name || !apiSyncForm.value.api_url) {
+    apiSyncErrorMsg.value = 'Nama dan URL API wajib diisi.';
+    return;
+  }
+  isSavingApi.value = true;
+  apiSyncErrorMsg.value = '';
+  
+  try {
+    const res = await fetch('/api/v1/import/api-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        action: 'save',
+        ...apiSyncForm.value
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      apiSyncSuccessMsg.value = `Berhasil! ${data.result.addedCount} monitor ditambahkan, ${data.result.updatedCount} diupdate.`;
+      isCreatingApiSync.value = false;
+      apiSyncForm.value = { name: '', api_url: '', sync_interval_hours: 168, default_interval_seconds: 60, auto_sync: true };
+      apiPreviewData.value = null;
+      await fetchApiIntegrations();
+      setTimeout(() => apiSyncSuccessMsg.value = '', 5000);
+    } else {
+      apiSyncErrorMsg.value = data.error || 'Gagal menyimpan dan import.';
+    }
+  } catch (err) {
+    apiSyncErrorMsg.value = 'Gagal menyimpan konfigurasi sync.';
+  } finally {
+    isSavingApi.value = false;
+  }
+}
+
+function deleteApiIntegration(id) {
+  if (confirm('Hapus integrasi auto-sync ini? (Monitor yang sudah diimport tidak akan dihapus)')) {
+    fetch(`/api/v1/import/api-sync?id=${id}`, { method: 'DELETE' })
+      .then(() => fetchApiIntegrations())
+      .catch(console.error);
+  }
+}
+
+function copyStandardJson() {
+  const json = `{\n  "status": "success",\n  "data": [\n    {\n      "nama_aplikasi": "Portal",\n      "url_aplikasi": "https://cianjurkab.go.id",\n      "kategori": "Layanan Utama",\n      "is_active": 1\n    }\n  ]\n}`;
+  navigator.clipboard.writeText(json);
+  alert('Format JSON disalin!');
+}
+
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    rawKumaJson.value = ev.target.result;
+  };
+  reader.readAsText(file);
+}
+
+async function submitKumaImport() {
+  if (!rawKumaJson.value || !rawKumaJson.value.trim()) {
+    importErrorMsg.value = 'File JSON kosong atau belum dipilih.';
+    return;
+  }
+  isImporting.value = true;
+  importErrorMsg.value = '';
+  importSuccessMsg.value = '';
+  
+  try {
+    const dataObj = JSON.parse(rawKumaJson.value);
+    const res = await fetch('/api/v1/import/kuma', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dataObj)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      importSuccessMsg.value = `Berhasil mengimpor ${result.imported_count} monitor.`;
+      rawKumaJson.value = '';
+    } else {
+      importErrorMsg.value = result.error || 'Gagal melakukan impor data.';
+    }
+  } catch (err) {
+    importErrorMsg.value = 'Data JSON tidak valid atau terputus.';
+  } finally {
+    isImporting.value = false;
+  }
+}
+
 onMounted(() => {
-  fetchBranding();
+  
   fetchChannels();
   fetchKeys();
   fetchAudit();
@@ -2299,5 +2760,7 @@ onMounted(() => {
   fetchStatusPages();
   fetchUsers();
   fetchProbeNodes();
+  fetchApiIntegrations();
+  check2FAStatus();
 });
 </script>

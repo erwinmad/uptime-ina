@@ -35,7 +35,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     // Allowed downtime minutes in this timeframe
     const allowedDowntimeMinutes = Number((totalMinutes * (1 - targetSla / 100)).toFixed(1));
 
-    const monitors = db.prepare('SELECT id, name, type, target, interval_seconds, active, current_status FROM monitors ORDER BY name ASC').all() as any[];
+    const monitors = db.prepare('SELECT id, name, type, target, interval_seconds, active, current_status, is_featured, category_name FROM monitors ORDER BY is_featured DESC, name ASC').all() as any[];
 
     const reportMonitors = monitors.map((m) => {
       // Fetch check aggregations
@@ -109,6 +109,8 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         type: m.type,
         target: m.target,
         active: m.active === 1,
+        is_featured: m.is_featured === 1,
+        category_name: m.category_name || 'Uncategorized',
         current_status: m.current_status,
         total_checks: totalChecks,
         up_checks: upChecks,

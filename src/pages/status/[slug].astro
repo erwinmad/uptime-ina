@@ -13,7 +13,7 @@ let initialData: any = null;
 
   if (page) {
     let monitors = db.prepare(`
-      SELECT m.id, m.name, m.type, m.current_status, m.last_checked_at, m.interval_seconds, spm.custom_label
+      SELECT m.id, m.name, m.type, m.current_status, m.last_checked_at, m.interval_seconds, spm.custom_label, COALESCE(spm.group_name, 'Layanan Utama') as group_name
       FROM status_page_monitors spm
       JOIN monitors m ON spm.monitor_id = m.id
       WHERE spm.status_page_id = ? AND m.active = 1
@@ -22,7 +22,7 @@ let initialData: any = null;
 
     if (monitors.length === 0) {
       monitors = db.prepare(`
-        SELECT id, name, type, current_status, last_checked_at, interval_seconds, name as custom_label
+        SELECT id, name, type, current_status, last_checked_at, interval_seconds, name as custom_label, 'Layanan Utama' as group_name
         FROM monitors
         WHERE active = 1
         ORDER BY created_at ASC

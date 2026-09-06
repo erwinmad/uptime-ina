@@ -10,7 +10,7 @@ export const GET: APIRoute = async () => {
       SELECT m.*, 
         (SELECT COUNT(*) FROM incidents i WHERE i.monitor_id = m.id AND i.status != 'resolved') as active_incidents_count
       FROM monitors m 
-      ORDER BY m.created_at DESC
+      ORDER BY m.is_featured DESC, m.created_at DESC
     `).all() as any[];
 
     // Enrich each monitor with SLA calculation (last 24h & 90d) and recent checks
@@ -73,7 +73,7 @@ export const POST: APIRoute = async ({ request }) => {
       port = null,
       interval_seconds = 60,
       timeout_seconds = 15,
-      retries_before_down = 3,
+      retries_before_down = 6,
       http_method = 'GET',
       http_headers = '{}',
       http_body = '',
@@ -85,7 +85,8 @@ export const POST: APIRoute = async ({ request }) => {
       tags = [],
       dns_record_type = 'A',
       dns_expected_value = '',
-      category_name = 'Uncategorized'
+      category_name = 'Uncategorized',
+      is_featured = 0
     } = body;
 
     if (!name || !target) {
@@ -112,18 +113,18 @@ export const POST: APIRoute = async ({ request }) => {
         id, name, type, target, port, interval_seconds, timeout_seconds, retries_before_down,
         http_method, http_headers, http_body, expected_status_codes, keyword_match, keyword_type,
         ssl_check_enabled, ssl_expiry_alert_days, push_token_raw, push_token_hash, 
-        push_expected_interval_seconds, push_grace_period_seconds, tags, dns_record_type, dns_expected_value, category_name
+        push_expected_interval_seconds, push_grace_period_seconds, tags, dns_record_type, dns_expected_value, category_name, is_featured
       ) VALUES (
         ?, ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?, ?
       )
     `).run(
       id, name, type, target, port, interval_seconds, timeout_seconds, retries_before_down,
       http_method, http_headers, http_body, expected_status_codes, keyword_match, keyword_type,
       ssl_check_enabled ? 1 : 0, ssl_expiry_alert_days, pushTokenRaw, pushTokenHash,
-      pushInterval, pushGrace, tagsJson, dns_record_type, dns_expected_value, category_name
+      pushInterval, pushGrace, tagsJson, dns_record_type, dns_expected_value, category_name, is_featured ? 1 : 0
     );
 
     logAudit('monitor.created', 'monitor', id, { name, type, target });

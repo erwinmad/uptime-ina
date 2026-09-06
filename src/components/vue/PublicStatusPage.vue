@@ -9,28 +9,30 @@
     <div class="max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1 space-y-8">
       
       <!-- Top Clean Floating Navbar -->
-      <header class="flex items-center justify-between gap-4 p-2 pl-3.5 pr-2 rounded-full bg-white ring-1 ring-zinc-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+      <header class="flex items-center justify-between gap-4 p-3 sm:px-5 sm:py-3.5 rounded-[1.25rem] bg-white ring-1 ring-zinc-200/80 shadow-sm">
         <div class="flex items-center gap-3">
-          <div class="w-7 h-7 rounded-full bg-zinc-100 ring-1 ring-zinc-200/60 flex items-center justify-center shrink-0">
-            <img v-if="isImageLogo(statusData?.branding?.logo_icon)" :src="statusData?.branding?.logo_icon" alt="Logo" class="w-4 h-4 object-contain rounded-full" />
-            <span v-else class="text-xs">{{ statusData?.branding?.logo_icon || '🌐' }}</span>
+          <div class="w-9 h-9 rounded-full bg-zinc-100 ring-1 ring-zinc-200 flex items-center justify-center text-base shrink-0">
+            <img v-if="isImageLogo(statusData?.branding?.logo_icon)" :src="statusData?.branding?.logo_icon" alt="Logo" class="w-5 h-5 object-contain rounded-full" />
+            <span v-else class="text-sm">{{ statusData?.branding?.logo_icon || '🌐' }}</span>
           </div>
           <div>
-            <h1 class="text-xs sm:text-sm font-semibold tracking-tight text-zinc-900">{{ statusData?.page?.title || statusData?.branding?.app_name || 'Status Layanan' }}</h1>
+            <h1 class="text-sm font-bold tracking-tight text-zinc-900">{{ statusData?.page?.title || statusData?.branding?.app_name || 'Status Layanan' }}</h1>
+            <p v-if="statusData?.branding?.app_tagline" class="text-[11px] text-zinc-400 font-medium hidden sm:block">{{ statusData?.branding?.app_tagline }}</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-50 border border-zinc-200/70 text-[10px] text-zinc-600 font-mono">
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-50 border border-zinc-200 text-[10px] text-zinc-600 font-mono font-bold tracking-wider uppercase">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Live Observability</span>
+            <span>{{ t('nav.liveObservability') }}</span>
           </div>
           
+          <LanguageSwitcher />
           <button 
             @click="isSubscribeModalOpen = true"
-            class="group relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 text-white font-medium text-xs transition-all duration-300 hover:bg-zinc-800 active:scale-[0.98] cursor-pointer shadow-sm"
+            class="group relative inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 text-white font-semibold text-xs transition-all duration-300 hover:bg-zinc-800 active:scale-[0.98] cursor-pointer shadow-sm"
           >
-            <span>Langganan</span>
+            <span>{{ t('public.subscribe') }}</span>
             <div class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
               <span class="text-[9px] leading-none">↗</span>
             </div>
@@ -98,7 +100,7 @@
                 <h3 class="text-base sm:text-lg font-extrabold tracking-tight"
                   :style="{ color: Number(averageUptime) >= 99 ? '#166534' : (Number(averageUptime) >= 90 ? '#92400e' : '#881337') }"
                 >
-                  {{ Number(averageUptime) >= 99 ? 'Semua Operasional' : (Number(averageUptime) >= 90 ? 'Degradasi Parsial' : 'Gangguan Kritis') }}
+                  {{ Number(averageUptime) >= 99 ? t('public.allOperational') : (Number(averageUptime) >= 90 ? t('public.partialDegradation') : t('public.criticalDisruption')) }}
                 </h3>
                 <p class="text-[11px] leading-tight"
                   :style="{ color: Number(averageUptime) >= 99 ? '#15803d' : (Number(averageUptime) >= 90 ? '#b45309' : '#be123c') }"
@@ -143,7 +145,7 @@
                 <span>Evaluasi SLA</span>
                 <span class="font-semibold font-mono"
                   :class="Number(averageUptime) >= 99 ? 'text-emerald-600' : (Number(averageUptime) >= 90 ? 'text-amber-600' : 'text-rose-600')">
-                  {{ Number(averageUptime) >= 99 ? 'Memenuhi Standar' : (Number(averageUptime) >= 90 ? 'Degradasi Parsial' : 'Di Bawah Standar') }}
+                  {{ Number(averageUptime) >= 99 ? t('public.meetsStandard') : (Number(averageUptime) >= 90 ? t('public.partialDegradation') : t('public.belowStandard')) }}
                 </span>
               </div>
             </div>
@@ -191,7 +193,7 @@
                 <div class="flex items-center gap-2 text-[10px] font-mono pt-0.5">
                   <span class="text-emerald-600 font-semibold">✓ {{ upCount }} Up</span>
                   <span v-if="downCount > 0" class="text-rose-600 font-semibold">✕ {{ downCount }} Down</span>
-                  <span v-if="pausedCount > 0" class="text-zinc-400 font-medium">⏸ {{ pausedCount }} Jeda</span>
+                  <span v-if="pausedCount > 0" class="text-zinc-400 font-medium">⏸ {{ pausedCount }} {{ t('public.pausedSuffix') }}</span>
                 </div>
               </div>
               <div class="pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px] font-mono text-zinc-400">
@@ -204,135 +206,153 @@
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
-        <!-- HEARTBEAT — Status Layanan (dipindahkan ke atas insiden) -->
+        <!-- HEARTBEAT — Status Layanan -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
-        <section class="space-y-3">
+        <section class="space-y-4">
           <div class="flex items-center justify-between px-1">
             <div class="flex items-center gap-2">
               <span class="text-sm">💓</span>
-              <h3 class="text-sm font-bold tracking-tight text-zinc-900">Status & Heartbeat Layanan</h3>
+              <h3 class="text-sm font-bold tracking-tight text-zinc-900">{{ t('public.heartbeatTitle') }}</h3>
             </div>
-            <span class="text-[10px] font-mono text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">Histori 60 Hari</span>
+            <span class="text-[10px] font-mono text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">{{ t('public.history60Days') }}</span>
           </div>
 
-          <div class="double-bezel">
-            <div class="double-bezel-inner divide-y divide-zinc-100 overflow-hidden">
-              <div v-if="!statusData?.monitors || statusData.monitors.length === 0" class="p-8 text-center text-xs text-zinc-400 font-mono">
-                Belum ada monitor layanan yang terdaftar.
+          <div v-if="!statusData?.monitors || statusData.monitors.length === 0" class="double-bezel">
+            <div class="double-bezel-inner p-8 text-center text-xs text-zinc-400 font-mono">
+              {{ t('public.noMonitorsPublic') }}
+            </div>
+          </div>
+
+          <div v-else class="space-y-6">
+            <!-- Group Looping -->
+            <div 
+              v-for="group in monitorsByGroup" 
+              :key="group.name"
+              class="space-y-3"
+            >
+              <!-- Group Header Label (Di Luar Card) -->
+              <div class="px-1 flex items-center justify-between">
+                <h3 class="text-sm font-extrabold text-zinc-900 tracking-wider uppercase">{{ group.name }}</h3>
+                <span class="text-[10px] font-mono font-bold text-zinc-500 bg-zinc-200/50 px-2 py-0.5 rounded-full">{{ t('public.servicesCount', {count: group.monitors.length}) }}</span>
               </div>
 
-              <div
-                v-for="m in statusData?.monitors"
-                :key="m.id"
-                class="p-3 sm:p-4 flex flex-col md:flex-row md:items-center gap-3 transition-colors duration-150 hover:bg-zinc-50/60"
-              >
-                <!-- Icon + Identity -->
-                <div class="flex items-center gap-3 min-w-0 md:w-56 shrink-0">
-                  <!-- Monitor Type Icon -->
+              <!-- Group Services Card -->
+              <div class="double-bezel">
+                <div class="double-bezel-inner divide-y divide-zinc-100 overflow-hidden">
                   <div
-                    class="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 ring-1"
-                    :class="m.current_status === 'up'
-                      ? 'bg-emerald-50 ring-emerald-200/80'
-                      : m.current_status === 'paused'
-                        ? 'bg-zinc-100 ring-zinc-200'
-                        : 'bg-rose-50 ring-rose-200/80'"
+                    v-for="m in group.monitors"
+                    :key="m.id"
+                    class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center gap-4 transition-colors duration-150 hover:bg-zinc-50/60"
                   >
-                    <span>{{ monitorIcon(m.type) }}</span>
-                  </div>
+                    <!-- Icon + Identity -->
+                    <div class="flex items-center gap-3.5 min-w-0 md:w-64 shrink-0">
+                      <!-- Monitor Type Icon -->
+                      <div
+                        class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ring-1"
+                        :class="m.current_status === 'up'
+                          ? 'bg-emerald-50 ring-emerald-200/80 shadow-[0_2px_10px_rgba(52,211,153,0.1)]'
+                          : m.current_status === 'paused'
+                            ? 'bg-zinc-100 ring-zinc-200'
+                            : 'bg-rose-50 ring-rose-200/80 shadow-[0_2px_10px_rgba(244,63,94,0.1)]'"
+                      >
+                        <span>{{ monitorIcon(m.type) }}</span>
+                      </div>
 
-                  <div class="min-w-0">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                      <span class="text-xs font-bold text-zinc-900 truncate">{{ m.custom_label || m.name }}</span>
-                      <span class="px-1.5 py-px rounded text-[8px] font-mono uppercase bg-zinc-100 text-zinc-500 border border-zinc-200 shrink-0">{{ m.type }}</span>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <span class="text-sm font-bold text-zinc-900 truncate">{{ m.custom_label || m.name }}</span>
+                          <span class="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider bg-zinc-100 text-zinc-500 border border-zinc-200 shrink-0">{{ m.type }}</span>
+                        </div>
+                        <!-- Response time micro info -->
+                        <div class="flex items-center gap-2 mt-1 text-[10px] font-mono text-zinc-500">
+                          <span class="flex items-center gap-1">
+                            <span>⚡</span>
+                            <span :class="latencyColor(m.avg_latency)">
+                              {{ m.avg_latency != null ? m.avg_latency + ' ms' : '—' }}
+                            </span>
+                          </span>
+                          <span class="text-zinc-300">|</span>
+                          <span class="font-medium text-zinc-700">{{ m.uptime_percentage }}% Uptime</span>
+                        </div>
+                      </div>
                     </div>
-                    <!-- Response time micro info -->
-                    <div class="flex items-center gap-2 mt-0.5 text-[10px] font-mono text-zinc-400">
-                      <span class="flex items-center gap-0.5">
-                        <span>⚡</span>
-                        <span :class="latencyColor(m.avg_latency)">
-                          {{ m.avg_latency != null ? m.avg_latency + ' ms' : '—' }}
-                        </span>
+
+                    <!-- Heartbeat Bars -->
+                    <div class="flex-1 min-w-0 space-y-1.5">
+                      <div class="flex items-center gap-[3px] h-6 px-1">
+                        <template v-if="m.recent_checks && m.recent_checks.length > 0">
+                          <div
+                            v-for="(c, idx) in m.recent_checks"
+                            :key="idx"
+                            class="relative flex-1 h-full flex items-center justify-center cursor-pointer"
+                            @mouseenter="(e) => showTooltip(e, { status: c.status, ms: c.response_time_ms, date: c.checked_at })"
+                            @mouseleave="hideTooltip"
+                          >
+                            <div
+                              class="w-full rounded-full transition-all duration-200 hover:scale-y-110"
+                              :class="{
+                                'bg-emerald-400 h-full': c.status === 'up',
+                                'bg-rose-500 h-3/5':     c.status !== 'up'
+                              }"
+                            ></div>
+                          </div>
+                          <div v-for="n in Math.max(0, 30 - m.recent_checks.length)" :key="'f-' + n"
+                            class="flex-1 h-2/3 rounded-full bg-zinc-200/60"></div>
+                        </template>
+
+                        <template v-else>
+                          <div
+                            v-for="(day, idx) in m.history"
+                            :key="idx"
+                            class="relative flex-1 h-full flex items-center justify-center cursor-pointer"
+                            @mouseenter="(e) => showTooltip(e, { upCount: day.up_count, total: day.total, date: day.date })"
+                            @mouseleave="hideTooltip"
+                          >
+                            <div
+                              class="w-full rounded-full transition-all duration-200 hover:scale-y-110"
+                              :class="{
+                                'bg-emerald-400 h-full': day.up_count === day.total,
+                                'bg-amber-400 h-4/5':    day.up_count < day.total && day.up_count > 0,
+                                'bg-rose-500 h-3/5':     day.up_count === 0
+                              }"
+                            ></div>
+                          </div>
+                          <div v-for="n in Math.max(0, 30 - (m.history ? m.history.length : 0))" :key="'fill-' + n"
+                            class="flex-1 h-2/3 rounded-full bg-zinc-200/60"></div>
+                        </template>
+                      </div>
+                      <div class="flex justify-between text-[9px] text-zinc-400 font-mono px-1">
+                        <span v-if="m.recent_checks && m.recent_checks.length > 0">{{ intervalLabel(m.interval_seconds) }} interval</span>
+                        <span v-else>60h lalu</span>
+                        <span class="text-zinc-500 font-medium">{{ m.uptime_percentage }}% SLA</span>
+                        <span>Kini</span>
+                      </div>
+                    </div>
+
+                    <!-- Status pill + last checked -->
+                    <div class="shrink-0 flex flex-col items-end gap-1 self-end md:self-auto">
+                      <span
+                        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold"
+                        :class="{
+                          'bg-emerald-50 text-emerald-700 border border-emerald-200': m.current_status === 'up',
+                          'bg-rose-50 text-rose-700 border border-rose-200':         m.current_status === 'down',
+                          'bg-zinc-100 text-zinc-600 border border-zinc-200':         m.current_status === 'paused'
+                        }"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full"
+                          :class="{
+                            'bg-emerald-500': m.current_status === 'up',
+                            'bg-rose-500 animate-pulse': m.current_status === 'down',
+                            'bg-zinc-400': m.current_status === 'paused'
+                          }"
+                        ></span>
+                        <span>{{ statusLabel(m.current_status) }}</span>
                       </span>
-                      <span class="text-zinc-200">|</span>
-                      <span>{{ m.uptime_percentage }}% uptime</span>
+                      <span class="text-[9px] font-mono text-zinc-400">
+                        {{ m.last_checked_at ? relativeTime(m.last_checked_at) : '—' }}
+                      </span>
                     </div>
                   </div>
-                </div>
-
-                <!-- Heartbeat Bars (recent checks = interval nyata per monitor) -->
-                <div class="flex-1 min-w-0 space-y-1.5">
-                  <div class="flex items-center gap-[3px] h-6 px-1">
-                    <template v-if="m.recent_checks && m.recent_checks.length > 0">
-                      <div
-                        v-for="(c, idx) in m.recent_checks"
-                        :key="idx"
-                        class="relative flex-1 h-full flex items-center justify-center cursor-pointer"
-                        @mouseenter="(e) => showTooltip(e, { status: c.status, ms: c.response_time_ms, date: c.checked_at })"
-                        @mouseleave="hideTooltip"
-                      >
-                        <div
-                          class="w-full rounded-full transition-all duration-200 hover:scale-y-110"
-                          :class="{
-                            'bg-emerald-400 h-full': c.status === 'up',
-                            'bg-rose-500 h-3/5':     c.status !== 'up'
-                          }"
-                        ></div>
-                      </div>
-                      <div v-for="n in Math.max(0, 30 - m.recent_checks.length)" :key="'f-' + n"
-                        class="flex-1 h-2/3 rounded-full bg-zinc-200/60"></div>
-                    </template>
-
-                    <template v-else>
-                      <div
-                        v-for="(day, idx) in m.history"
-                        :key="idx"
-                        class="relative flex-1 h-full flex items-center justify-center cursor-pointer"
-                        @mouseenter="(e) => showTooltip(e, { upCount: day.up_count, total: day.total, date: day.date })"
-                        @mouseleave="hideTooltip"
-                      >
-                        <div
-                          class="w-full rounded-full transition-all duration-200 hover:scale-y-110"
-                          :class="{
-                            'bg-emerald-400 h-full': day.up_count === day.total,
-                            'bg-amber-400 h-4/5':    day.up_count < day.total && day.up_count > 0,
-                            'bg-rose-500 h-3/5':     day.up_count === 0
-                          }"
-                        ></div>
-                      </div>
-                      <div v-for="n in Math.max(0, 30 - (m.history ? m.history.length : 0))" :key="'fill-' + n"
-                        class="flex-1 h-2/3 rounded-full bg-zinc-200/60"></div>
-                    </template>
-                  </div>
-                  <div class="flex justify-between text-[9px] text-zinc-400 font-mono px-1">
-                    <span v-if="m.recent_checks && m.recent_checks.length > 0">{{ intervalLabel(m.interval_seconds) }} interval</span>
-                    <span v-else>60h lalu</span>
-                    <span class="text-zinc-500 font-medium">{{ m.uptime_percentage }}% SLA</span>
-                    <span>Kini</span>
-                  </div>
-                </div>
-
-                <!-- Status pill + last checked -->
-                <div class="shrink-0 flex flex-col items-end gap-1 self-end md:self-auto">
-                  <span
-                    class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold"
-                    :class="{
-                      'bg-emerald-50 text-emerald-700 border border-emerald-200': m.current_status === 'up',
-                      'bg-rose-50 text-rose-700 border border-rose-200':         m.current_status === 'down',
-                      'bg-zinc-100 text-zinc-600 border border-zinc-200':         m.current_status === 'paused'
-                    }"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full"
-                      :class="{
-                        'bg-emerald-500': m.current_status === 'up',
-                        'bg-rose-500 animate-pulse': m.current_status === 'down',
-                        'bg-zinc-400': m.current_status === 'paused'
-                      }"
-                    ></span>
-                    <span>{{ statusLabel(m.current_status) }}</span>
-                  </span>
-                  <span class="text-[9px] font-mono text-zinc-400">
-                    {{ m.last_checked_at ? relativeTime(m.last_checked_at) : '—' }}
-                  </span>
                 </div>
               </div>
             </div>
@@ -355,7 +375,7 @@
           <div class="flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full" :class="hoverTooltip.isUp ? 'bg-emerald-400' : 'bg-rose-500 animate-pulse'"></span>
             <span class="font-bold uppercase tracking-wider text-[9px]" :class="hoverTooltip.isUp ? 'text-emerald-400' : 'text-rose-400'">
-              {{ hoverTooltip.isUp ? 'Operasional' : 'Gangguan' }}
+              {{ hoverTooltip.isUp ? t('public.operational') : t('public.disrupted') }}
             </span>
           </div>
           <span v-if="hoverTooltip.ms !== undefined" class="font-mono text-zinc-300 font-semibold">
@@ -479,6 +499,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import ToastContainer from './ToastContainer.vue';
 import { setToastRef, useToast } from './useToast.js';
+import { useI18n } from '../../lib/i18n';
+import LanguageSwitcher from './LanguageSwitcher.vue';
+const { t, locale } = useI18n();
 
 const props = defineProps({
   slug: String,
@@ -551,21 +574,35 @@ const heroPulseClass = computed(() => {
 });
 
 const heroBadgeText = computed(() => {
-  if (systemState.value === 'operational') return 'Normal Operasional';
+  if (systemState.value === 'operational') return t('public.normalOperational');
   if (systemState.value === 'degraded') return 'Kinerja Terdegradasi';
-  return 'Gangguan Aktif';
+  return t('public.activeDisruption');
 });
 
 const heroTitle = computed(() => {
   if (systemState.value === 'operational') return 'Semua Sistem & Endpoint Berjalan Normal';
   if (systemState.value === 'degraded') return 'Sebagian Layanan Mengalami Degradasi';
-  return 'Gangguan Konektivitas Terdeteksi';
+  return t('public.connectivityDetected');
 });
 
 const heroSubtitle = computed(() => {
   if (systemState.value === 'operational') return 'Infrastruktur beroperasi dalam toleransi latensi dan ketersediaan optimal. Tidak ditemukan kendala aktif pada komponen inti.';
   if (systemState.value === 'degraded') return 'Beberapa target mengalami peningkatan waktu respons atau kegagalan probe berkala. Tim teknis sedang melakukan investigasi.';
   return 'Kegagalan koneksi terdeteksi pada simpul layanan utama. Penanganan darurat sedang diupayakan.';
+});
+
+const monitorsByGroup = computed(() => {
+  const list = statusData.value?.monitors || [];
+  const groups = {};
+  for (const m of list) {
+    const grp = m.group_name || 'Layanan Utama';
+    if (!groups[grp]) groups[grp] = [];
+    groups[grp].push(m);
+  }
+  return Object.keys(groups).map(name => ({
+    name,
+    monitors: groups[name]
+  }));
 });
 
 const upCount = computed(() => {
@@ -624,9 +661,9 @@ function intervalLabel(seconds) {
 }
 
 function statusLabel(status) {
-  if (status === 'up') return 'Operasional';
-  if (status === 'down') return 'Gangguan';
-  if (status === 'paused') return 'Dijeda';
+  if (status === 'up') return t('public.operational');
+  if (status === 'down') return t('public.disrupted');
+  if (status === 'paused') return t('public.paused');
   return 'Degradasi';
 }
 
@@ -681,15 +718,15 @@ async function submitUnlock() {
     const data = await res.json();
     if (res.ok) {
       isLocked.value = false;
-      toast.success('Halaman status berhasil dibuka.', 'Akses Terverifikasi');
+      toast.success(t('toast.urlCopied'), t('toast.accessVerified'));
       fetchStatus();
     } else {
       unlockError.value = data.error || 'Kata sandi tidak valid.';
-      toast.error(unlockError.value, 'Akses Ditolak');
+      toast.error(unlockError.value, t('toast.accessDenied'));
     }
   } catch (err) {
     unlockError.value = 'Gagal menghubungi server.';
-    toast.error('Terjadi gangguan jaringan saat memverifikasi sandi.', 'Kesalahan Jaringan');
+    toast.error(t('toast.networkError'), t('toast.accessDenied'));
   } finally {
     isUnlocking.value = false;
   }
@@ -709,7 +746,7 @@ async function submitSubscribe() {
     const data = await res.json();
     if (res.ok) {
       subscribeMsg.value = data.message || 'Berhasil berlangganan notifikasi!';
-      toast.success(`Notifikasi akan dikirimkan ke ${subscriberEmail.value}`, 'Berlangganan Aktif');
+      toast.success(t('toast.subscribeActive'), t('toast.subscribeActive'));
       subscriberEmail.value = '';
       setTimeout(() => {
         isSubscribeModalOpen.value = false;
@@ -717,11 +754,11 @@ async function submitSubscribe() {
       }, 1500);
     } else {
       subscribeError.value = data.error || 'Gagal berlangganan.';
-      toast.error(subscribeError.value, 'Gagal');
+      toast.error(subscribeError.value, t('toast.deleteFailed'));
     }
   } catch (err) {
     subscribeError.value = 'Terjadi kesalahan sistem.';
-    toast.error('Tidak dapat mendaftarkan email ke sistem saat ini.', 'Kesalahan Sistem');
+    toast.error(t('toast.networkError'), t('toast.systemError'));
   } finally {
     isSubscribing.value = false;
   }
@@ -731,7 +768,7 @@ function copyRssFeedUrl() {
   const targetSlug = props.slug || 'main';
   const url = `${window.location.origin}/status/${targetSlug}/rss.xml`;
   navigator.clipboard.writeText(url);
-  toast.info('Tautan RSS Feed berhasil disalin ke papan klip!', 'RSS Tersalin');
+  toast.info(t('toast.urlCopied'), t('toast.rssCopied'));
 }
 
 async function fetchStatus() {

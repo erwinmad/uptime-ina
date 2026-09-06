@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { db, getBrandingSettings } from '../../../../lib/db.js';
+import { db, getBrandingSettings, validateSession } from '../../../../lib/db.js';
 
 export const GET: APIRoute = async ({ params }) => {
   try {
@@ -12,10 +12,9 @@ export const GET: APIRoute = async ({ params }) => {
 
     const branding = getBrandingSettings();
 
-    // Get assigned monitors
-    // If no monitors specifically linked, show all active monitors by default
+    // Get assigned monitors with their custom group
     let monitors = db.prepare(`
-      SELECT m.id, m.name, m.type, m.current_status, m.last_checked_at, m.interval_seconds, spm.custom_label
+      SELECT m.id, m.name, m.type, m.current_status, m.last_checked_at, m.interval_seconds, spm.custom_label, COALESCE(spm.group_name, 'Layanan Utama') as group_name
       FROM status_page_monitors spm
       JOIN monitors m ON spm.monitor_id = m.id
       WHERE spm.status_page_id = ? AND m.active = 1
@@ -24,7 +23,7 @@ export const GET: APIRoute = async ({ params }) => {
 
     if (monitors.length === 0) {
       monitors = db.prepare(`
-        SELECT id, name, type, current_status, last_checked_at, interval_seconds, name as custom_label
+        SELECT id, name, type, current_status, last_checked_at, interval_seconds, name as custom_label, 'Layanan Utama' as group_name
         FROM monitors
         WHERE active = 1
         ORDER BY created_at ASC
@@ -111,6 +110,92 @@ export const GET: APIRoute = async ({ params }) => {
         headers: { 'Content-Type': 'application/json' }
       }
     );
+  } catch (err: any) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
+};
+
+export const PUT: APIRoute = async ({ params, request, cookies }) => {
+  try {
+    const token = cookies.get('session')?.value || cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    const session = token ? validateSession(token) : null;
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Sesi login tidak valid' }), { status: 401 });
+    }
+
+    const { slug: idOrSlug } = params;
+    const body = await request.json();
+    const { title, slug, description, is_public = 1, password = '', monitor_groups = [] } = body;
+
+    // Check by ID or by Slug
+    const page = db.prepare('SELECT * FROM status_pages WHERE id = ? OR slug = ?').get(idOrSlug, idOrSlug) as any;
+    if (!page) {
+      return new Response(JSON.stringify({ error: 'Status page tidak ditemukan' }), { status: 404 });
+    }
+
+    let passwordHash = page.password_hash;
+    if (password && password.trim()) {
+      passwordHash = password.trim();
+    } else if (password === '') {
+      passwordHash = null;
+    }
+
+    db.prepare(`
+      UPDATE status_pages 
+      SET title = ?, slug = ?, description = ?, is_public = ?, password_hash = ?
+      WHERE id = ?
+    `).run(
+      title || page.title,
+      slug || page.slug,
+      description !== undefined ? description : page.description,
+      is_public ? 1 : 0,
+      passwordHash,
+      page.id
+    );
+
+    // Update assigned monitors based on custom groups
+    db.prepare('DELETE FROM status_page_monitors WHERE status_page_id = ?').run(page.id);
+    if (Array.isArray(monitor_groups) && monitor_groups.length > 0) {
+      const insertStmt = db.prepare('INSERT INTO status_page_monitors (status_page_id, monitor_id, display_order, group_name) VALUES (?, ?, ?, ?)');
+      let globalDisplayOrder = 0;
+      monitor_groups.forEach((group: any) => {
+        const grpName = group.group_name || 'Layanan Umum';
+        if (Array.isArray(group.monitors)) {
+          group.monitors.forEach((monId: string) => {
+            insertStmt.run(page.id, monId, globalDisplayOrder++, grpName);
+          });
+        }
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true, message: 'Status page berhasil diperbarui' }), { status: 200 });
+  } catch (err: any) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
+};
+
+export const DELETE: APIRoute = async ({ params, cookies, request }) => {
+  try {
+    const token = cookies.get('session')?.value || cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    const session = token ? validateSession(token) : null;
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Sesi login tidak valid' }), { status: 401 });
+    }
+
+    const { slug: idOrSlug } = params;
+    const page = db.prepare('SELECT * FROM status_pages WHERE id = ? OR slug = ?').get(idOrSlug, idOrSlug) as any;
+    if (!page) {
+      return new Response(JSON.stringify({ error: 'Status page tidak ditemukan' }), { status: 404 });
+    }
+
+    if (page.slug === 'main') {
+      return new Response(JSON.stringify({ error: 'Halaman status utama (main) tidak dapat dihapus' }), { status: 400 });
+    }
+
+    db.prepare('DELETE FROM status_page_monitors WHERE status_page_id = ?').run(page.id);
+    db.prepare('DELETE FROM status_pages WHERE id = ?').run(page.id);
+
+    return new Response(JSON.stringify({ success: true, message: 'Status page berhasil dihapus' }), { status: 200 });
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }

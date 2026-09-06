@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const token = cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    const token = cookies.get('session')?.value || cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
     const session = token ? validateSession(token) : null;
 
     if (!session) {
@@ -23,8 +23,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const insertStmt = db.prepare(`
       INSERT INTO monitors (
         id, name, type, target, port, interval_seconds, timeout_seconds, retries_before_down,
-        keyword_match, keyword_type, ssl_check_enabled, active, current_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'pending')
+        expected_status_codes, keyword_match, keyword_type, ssl_check_enabled, active, current_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '[200, 201, 301, 302, 403]', ?, ?, ?, 1, 'pending')
     `);
 
     for (const item of monitorsList) {
@@ -33,15 +33,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       let type = 'http';
       const rawType = String(item.type || '').toLowerCase();
       if (rawType.includes('port') || rawType === 'tcp') type = 'tcp';
-      else if (rawType.includes('ping')) type = 'tcp'; // mapped to TCP check
+      else if (rawType.includes('ping')) type = 'ping';
       else if (rawType.includes('push')) type = 'push';
       else if (rawType.includes('dns')) type = 'dns';
 
       const target = item.url || item.hostname || item.target || 'http://localhost';
       const port = item.port ? parseInt(item.port, 10) : null;
-      const interval = item.interval ? parseInt(item.interval, 10) : 60;
-      const retries = item.maxretries ? parseInt(item.maxretries, 10) : 3;
-      const keyword = item.keyword || null;
+      const interval = 3600; // Selalu override jadi 3600 (1 jam)
+      const retries = item.maxretries ? parseInt(item.maxretries, 10) : 6;
+      const keyword = item.keyword || '';
       const ssl = target.startsWith('https://') ? 1 : 0;
       const id = 'mon_' + nanoid(10);
 

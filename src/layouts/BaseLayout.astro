@@ -38,6 +38,7 @@ const faviconHref = branding.favicon_url && branding.favicon_url.trim() !== ''
     <link rel="icon" id="layout-favicon" href={faviconHref} />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#FAFAFA" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -48,6 +49,15 @@ const faviconHref = branding.favicon_url && branding.favicon_url.trim() !== ''
     <slot />
 
     <script is:inline>
+      // Init language from localStorage (bilingual ID/EN)
+      try {
+        const saved = localStorage.getItem('app_lang');
+        if (saved === 'id' || saved === 'en') document.documentElement.lang = saved;
+        else if (navigator.language && navigator.language.toLowerCase().startsWith('en')) document.documentElement.lang = 'en';
+      } catch {}
+      window.addEventListener('app:locale-changed', (e) => {
+        if (e.detail === 'id' || e.detail === 'en') document.documentElement.lang = e.detail;
+      });
       // Global live listener for branding updates across tabs
       window.addEventListener('branding_updated', (e) => {
         const b = e.detail;

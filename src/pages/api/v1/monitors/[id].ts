@@ -60,13 +60,35 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     const { id } = params;
     const body = await request.json();
 
+    const monitor = db.prepare('SELECT * FROM monitors WHERE id = ?').get(id) as MonitorRecord | undefined;
+    if (!monitor) {
+      return new Response(JSON.stringify({ error: 'Monitor tidak ditemukan' }), { status: 404 });
+    }
+
+    // If only requested to run check now without other field updates
+    if (body.run_check_now) {
+      await executeCheck(monitor);
+      const lastCheck = db.prepare('SELECT * FROM monitor_checks WHERE monitor_id = ? ORDER BY checked_at DESC LIMIT 1').get(id) as any;
+      const freshMonitor = db.prepare('SELECT * FROM monitors WHERE id = ?').get(id) as any;
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: 'Check completed',
+        check_result: lastCheck,
+        monitor: freshMonitor
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const allowedFields = [
       'name', 'target', 'port', 'interval_seconds', 'timeout_seconds',
       'retries_before_down', 'http_method', 'http_headers', 'http_body',
       'expected_status_codes', 'keyword_match', 'keyword_type',
       'ssl_check_enabled', 'ssl_expiry_alert_days', 'active', 'current_status',
       'push_expected_interval_seconds', 'push_grace_period_seconds',
-      'tags', 'dns_record_type', 'dns_expected_value', 'category_name'
+      'tags', 'dns_record_type', 'dns_expected_value', 'category_name', 'is_featured'
     ];
 
     const updates: string[] = [];
@@ -84,7 +106,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     }
 
     if (updates.length === 0) {
-      return new Response(JSON.stringify({ error: 'No valid fields provided' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Tidak ada data valid yang diubah' }), { status: 400 });
     }
 
     updates.push("updated_at = datetime('now')");
@@ -95,11 +117,6 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     logAudit('monitor.updated', 'monitor', id, body);
 
     const updated = db.prepare('SELECT * FROM monitors WHERE id = ?').get(id);
-
-    // If requested test probe immediately
-    if (body.run_check_now) {
-      executeCheck(updated as MonitorRecord).catch(console.error);
-    }
 
     return new Response(JSON.stringify(updated), {
       status: 200,

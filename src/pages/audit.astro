@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Dashboard from '../components/vue/Dashboard.vue';
+import AuditView from '../components/vue/AuditView.vue';
 import { validateSession } from '../lib/db.js';
 
 const token = Astro.cookies.get('sentinel_session')?.value;
@@ -11,9 +11,8 @@ if (!session) {
 }
 ---
 
-<BaseLayout title="Dashboard & Live Monitors">
+<BaseLayout title="Audit Trail">
   <main>
-    <Dashboard client:only="vue" currentUser={session.user} />
+    <AuditView client:only="vue" currentUser={session.user} />
   </main>
 </BaseLayout>
-

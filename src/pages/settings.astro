@@ -13,7 +13,7 @@ if (!session) {
 
 <BaseLayout title="Pengaturan & Integrasi">
   <main>
-    <SettingsView client:load currentUser={session.user} />
+    <SettingsView client:only="vue" currentUser={session.user} />
   </main>
 </BaseLayout>
 

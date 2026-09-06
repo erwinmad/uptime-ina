@@ -13,6 +13,6 @@ if (!session) {
 
 <BaseLayout title="Laporan SLA & Kepatuhan Layanan">
   <main>
-    <ReportsView client:load currentUser={session.user} />
+    <ReportsView client:only="vue" currentUser={session.user} />
   </main>
 </BaseLayout>

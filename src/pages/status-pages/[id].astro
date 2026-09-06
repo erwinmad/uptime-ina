@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StatusPageEditor from '../../components/vue/StatusPageEditor.vue';
+import { validateSession } from '../../lib/db.js';
+
+const token = Astro.cookies.get('session')?.value || Astro.cookies.get('sentinel_session')?.value;
+const session = token ? validateSession(token) : null;
+
+if (!session) {
+  return Astro.redirect('/login');
+}
+
+const { id } = Astro.params;
+---
+
+<BaseLayout title={id === 'new' ? 'Buat Status Page Baru' : 'Kelola Status Page'}>
+  <main>
+    <StatusPageEditor client:only="vue" currentUser={session.user} pageId={id} />
+  </main>
+</BaseLayout>

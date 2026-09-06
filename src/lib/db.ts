@@ -47,7 +47,7 @@ export function initDb() {
       port INTEGER,
       interval_seconds INTEGER DEFAULT 60,
       timeout_seconds INTEGER DEFAULT 15,
-      retries_before_down INTEGER DEFAULT 3,
+      retries_before_down INTEGER DEFAULT 6,
       http_method TEXT DEFAULT 'GET',
       http_headers TEXT DEFAULT '{}',
       http_body TEXT,
@@ -75,6 +75,17 @@ export function initDb() {
 
     CREATE INDEX IF NOT EXISTS idx_monitors_active ON monitors(active);
     CREATE INDEX IF NOT EXISTS idx_monitors_status ON monitors(current_status);
+
+    CREATE TABLE IF NOT EXISTS api_integrations (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      api_url TEXT NOT NULL,
+      sync_interval_hours INTEGER DEFAULT 168, -- default 1 week
+      default_interval_seconds INTEGER DEFAULT 60,
+      auto_sync INTEGER DEFAULT 1,
+      last_synced_at TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
 
     CREATE TABLE IF NOT EXISTS maintenance_windows (
       id TEXT PRIMARY KEY,

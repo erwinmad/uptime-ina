@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from '../../lib/i18n';
+const { t } = useI18n();
 
 const loading = ref(true);
 const submitting = ref(false);
@@ -17,8 +19,10 @@ const branding = ref({
 // Form state - Strictly login only
 const form = ref({
   email: '',
-  password: ''
+  password: '',
+  totp_code: ''
 });
+const requires2FA = ref(false);
 
 const isImg = (s: string) => s && (s.startsWith('http') || s.startsWith('/') || s.startsWith('data:image'));
 
@@ -53,6 +57,10 @@ async function handleLogin() {
     errorMessage.value = 'Akses ditolak: Kredensial tidak lengkap.';
     return;
   }
+  if (requires2FA.value && !form.value.totp_code) {
+    errorMessage.value = 'Kode Autentikator 6-digit wajib diisi.';
+    return;
+  }
 
   submitting.value = true;
 
@@ -63,11 +71,18 @@ async function handleLogin() {
       body: JSON.stringify({
         action: 'login',
         email: form.value.email,
-        password: form.value.password
+        password: form.value.password,
+        totp_code: form.value.totp_code
       })
     });
 
     const data = await res.json();
+
+    if (res.ok && data.needs_2fa) {
+      requires2FA.value = true;
+      submitting.value = false;
+      return;
+    }
 
     if (!res.ok) {
       throw new Error(data.error || 'Akses ditolak: Kredensial tidak valid.');
@@ -163,13 +178,28 @@ onMounted(() => {
                 />
               </div>
 
+              <div v-if="requires2FA" class="space-y-1.5 p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl animate-in zoom-in-95 duration-200">
+                <div class="flex items-center justify-between">
+                  <label class="block text-[10px] font-mono uppercase tracking-widest text-zinc-700 font-bold">Kode Autentikator 2FA</label>
+                  <span class="text-[9px] font-mono text-emerald-600 font-bold">Google Auth / TOTP</span>
+                </div>
+                <input
+                  v-model="form.totp_code"
+                  type="text"
+                  maxlength="6"
+                  placeholder="Contoh: 123456"
+                  class="w-full bg-white border border-zinc-200 rounded-lg px-4 py-2 text-center text-sm font-mono tracking-widest text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-bold"
+                  autofocus
+                />
+              </div>
+
               <button
                 type="submit"
                 :disabled="submitting"
                 class="group w-full mt-2 py-3 px-5 rounded-xl font-semibold text-xs text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
               >
                 <span v-if="submitting" class="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                <span>{{ submitting ? 'Memverifikasi...' : 'Masuk Sistem' }}</span>
+                <span>{{ submitting ? 'Memverifikasi...' : (requires2FA ? 'Verifikasi & Masuk' : 'Masuk Sistem') }}</span>
                 <div v-if="!submitting" class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1">
                   <span class="text-[9px]">→</span>
                 </div>

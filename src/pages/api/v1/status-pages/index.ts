@@ -13,8 +13,23 @@ export const GET: APIRoute = async () => {
 
     const result = pages.map(p => {
       const monitorRows = db.prepare(`
-        SELECT monitor_id FROM status_page_monitors WHERE status_page_id = ? ORDER BY display_order ASC
-      `).all(p.id) as { monitor_id: string }[];
+        SELECT spm.monitor_id, COALESCE(spm.group_name, 'Layanan Utama') as group_name
+        FROM status_page_monitors spm
+        WHERE spm.status_page_id = ? 
+        ORDER BY spm.display_order ASC
+      `).all(p.id) as { monitor_id: string; group_name: string }[];
+
+      // Organize into monitor_groups
+      const groupMap: Record<string, string[]> = {};
+      monitorRows.forEach(r => {
+        if (!groupMap[r.group_name]) groupMap[r.group_name] = [];
+        groupMap[r.group_name].push(r.monitor_id);
+      });
+
+      const monitor_groups = Object.keys(groupMap).map(name => ({
+        group_name: name,
+        monitors: groupMap[name]
+      }));
 
       return {
         id: p.id,
@@ -25,6 +40,7 @@ export const GET: APIRoute = async () => {
         is_protected: Boolean(p.password_hash && p.password_hash.trim() !== ''),
         url: `/status/${p.slug}`,
         monitor_ids: monitorRows.map(m => m.monitor_id),
+        monitor_groups,
         monitors_count: monitorRows.length,
         created_at: p.created_at
       };
@@ -41,14 +57,14 @@ export const GET: APIRoute = async () => {
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const token = cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    const token = cookies.get('session')?.value || cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
     const session = token ? validateSession(token) : null;
     if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+      return new Response(JSON.stringify({ error: 'Sesi login tidak valid' }), { status: 401 });
     }
 
     const body = await request.json();
-    const { title, slug: rawSlug, description = '', is_public = true, password = '', monitor_ids = [] } = body;
+    const { title, slug: rawSlug, description = '', is_public = true, password = '', monitor_groups = [] } = body;
 
     if (!title || !title.trim()) {
       return new Response(JSON.stringify({ error: 'Judul status page wajib diisi' }), { status: 400 });
@@ -78,18 +94,24 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(id, slug, title.trim(), description.trim(), is_public ? 1 : 0, passwordHash);
 
-    // Link monitors
-    if (Array.isArray(monitor_ids) && monitor_ids.length > 0) {
+    // Link monitors with custom group names
+    if (Array.isArray(monitor_groups) && monitor_groups.length > 0) {
       const insertStmt = db.prepare(`
-        INSERT INTO status_page_monitors (status_page_id, monitor_id, display_order)
-        VALUES (?, ?, ?)
+        INSERT INTO status_page_monitors (status_page_id, monitor_id, display_order, group_name)
+        VALUES (?, ?, ?, ?)
       `);
-      for (let i = 0; i < monitor_ids.length; i++) {
-        insertStmt.run(id, monitor_ids[i], i);
+      let order = 0;
+      for (const group of monitor_groups) {
+        const grpName = group.group_name || 'Layanan Utama';
+        if (Array.isArray(group.monitors)) {
+          for (const monId of group.monitors) {
+            insertStmt.run(id, monId, order++, grpName);
+          }
+        }
       }
     }
 
-    logAudit('status_page.created', 'status_page', id, { slug, title, monitor_count: monitor_ids.length });
+    logAudit('status_page.created', 'status_page', id, { slug, title, groups_count: monitor_groups.length });
 
     return new Response(JSON.stringify({
       success: true,
@@ -107,10 +129,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
 export const DELETE: APIRoute = async ({ request, cookies }) => {
   try {
-    const token = cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    const token = cookies.get('session')?.value || cookies.get('sentinel_session')?.value || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
     const session = token ? validateSession(token) : null;
     if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+      return new Response(JSON.stringify({ error: 'Sesi login tidak valid' }), { status: 401 });
     }
 
     const url = new URL(request.url);

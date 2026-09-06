@@ -3,10 +3,9 @@ import path from 'path';
 import fs from 'fs';
 import sirv from 'sirv';
 import { fileURLToPath } from 'url';
-import { WebSocketServer, WebSocket } from 'ws';
 import { startMonitoringEngine } from './lib/engine.js';
 import { db } from './lib/db.js';
-import { broadcastEvent } from './lib/websocket.js';
+import { initWebSocketServer, broadcastEvent } from './lib/websocket.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,9 +23,9 @@ async function start() {
     db.prepare(`
       INSERT INTO monitors (id, name, type, target, interval_seconds, timeout_seconds, retries_before_down, current_status)
       VALUES 
-        ('mon_cloudflare', 'Cloudflare DNS', 'http', 'https://1.1.1.1', 30, 10, 2, 'pending'),
-        ('mon_google_dns', 'Google Public DNS', 'tcp', '8.8.8.8', 30, 10, 2, 'pending'),
-        ('mon_github', 'GitHub API', 'http', 'https://api.github.com', 45, 10, 2, 'pending')
+        ('mon_cloudflare', 'Cloudflare DNS', 'http', 'https://1.1.1.1', 30, 10, 6, 'pending'),
+        ('mon_google_dns', 'Google Public DNS', 'tcp', '8.8.8.8', 30, 10, 6, 'pending'),
+        ('mon_github', 'GitHub API', 'http', 'https://api.github.com', 45, 10, 6, 'pending')
     `).run();
   }
 
@@ -59,25 +58,7 @@ async function start() {
   });
 
   // 5. Attach WebSocket server on /ws
-  const wss = new WebSocketServer({ noServer: true });
-  const clients = new Set<WebSocket>();
-
-  server.on('upgrade', (request, socket, head) => {
-    const { pathname } = new URL(request.url || '', `http://${request.headers.host}`);
-    if (pathname === '/ws') {
-      wss.handleUpgrade(request, socket, head, (ws) => {
-        wss.emit('connection', ws, request);
-      });
-    }
-  });
-
-  wss.on('connection', (ws) => {
-    clients.add(ws);
-    ws.send(JSON.stringify({ type: 'connected', time: new Date().toISOString() }));
-
-    ws.on('close', () => clients.delete(ws));
-    ws.on('error', () => clients.delete(ws));
-  });
+  initWebSocketServer(server);
 
   // 6. Start the Probing Scheduler Engine
   startMonitoringEngine();

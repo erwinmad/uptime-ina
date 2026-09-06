@@ -13,7 +13,7 @@ if (!session) {
 
 <BaseLayout title="Incident Response & Timeline">
   <main>
-    <IncidentView client:load currentUser={session.user} />
+    <IncidentView client:only="vue" currentUser={session.user} />
   </main>
 </BaseLayout>
 

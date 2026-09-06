@@ -6,6 +6,7 @@ import dns from 'dns';
 import { db } from './db.js';
 import { broadcastEvent } from './websocket.js';
 import { dispatchAlert } from './notifications.js';
+import { processApiSync } from './apiSync.js';
 import { nanoid } from 'nanoid';
 
 export interface MonitorRecord {
@@ -136,7 +137,8 @@ async function probeHttp(monitor: MonitorRecord): Promise<CheckResult> {
           path: parsedUrl.pathname + parsedUrl.search,
           method: monitor.http_method || 'GET',
           headers: {
-            'User-Agent': 'SentinelUp-Monitor/1.0',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': '*/*',
             ...customHeaders
           },
           timeout: timeoutMs,
@@ -179,6 +181,22 @@ async function probeHttp(monitor: MonitorRecord): Promise<CheckResult> {
                 responseTimeMs,
                 statusCode,
                 errorMessage: `Keyword assertion failed: "${monitor.keyword_match}" (${monitor.keyword_type || 'contains'})`,
+                sslDaysRemaining
+              });
+            } else if (monitor.ssl_check_enabled && sslDaysRemaining !== undefined && sslDaysRemaining <= 0) {
+              resolve({
+                status: 'down',
+                responseTimeMs,
+                statusCode,
+                errorMessage: `SSL Certificate Expired! (-${Math.abs(sslDaysRemaining)} days)`,
+                sslDaysRemaining
+              });
+            } else if (monitor.ssl_check_enabled && sslDaysRemaining !== undefined && sslDaysRemaining < (monitor.ssl_expiry_alert_days || 14)) {
+              resolve({
+                status: 'down',
+                responseTimeMs,
+                statusCode,
+                errorMessage: `SSL Certificate expires soon (${sslDaysRemaining} days remaining)`,
                 sslDaysRemaining
               });
             } else {
@@ -225,6 +243,40 @@ async function probeHttp(monitor: MonitorRecord): Promise<CheckResult> {
       });
     }
   });
+}
+
+import { exec } from 'child_process';
+import util from 'util';
+
+const execPromise = util.promisify(exec);
+
+/** Check ICMP Ping target */
+async function probePing(monitor: MonitorRecord): Promise<CheckResult> {
+  const startTime = Date.now();
+  // Strip http:// or https:// if provided in ping target
+  const host = monitor.target.replace(/^https?:\/\//, '').split('/')[0].split(':')[0];
+  const timeoutMs = (monitor.timeout_seconds || 15); // ping flag generally uses seconds
+
+  try {
+    // Cross-platform ping command (macOS/Linux)
+    const isWin = process.platform === 'win32';
+    const cmd = isWin 
+      ? `ping -n 1 -w ${timeoutMs * 1000} ${host}`
+      : `ping -c 1 -W ${timeoutMs} ${host}`;
+
+    await execPromise(cmd);
+
+    return {
+      status: 'up',
+      responseTimeMs: Date.now() - startTime
+    };
+  } catch (err: any) {
+    return {
+      status: 'down',
+      responseTimeMs: Date.now() - startTime,
+      errorMessage: `ICMP Ping failed: Target unreachable or timed out.`
+    };
+  }
 }
 
 /** Check TCP Port target */
@@ -352,6 +404,75 @@ async function probeDns(monitor: MonitorRecord): Promise<CheckResult> {
   });
 }
 
+async function probeBrowser(monitor: MonitorRecord): Promise<CheckResult> {
+  const startTime = Date.now();
+  try {
+    const { chromium } = await import('playwright');
+    // Launch headless chromium with minimal arguments for performance
+    const browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+    });
+    
+    const context = await browser.newContext({
+      ignoreHTTPSErrors: true,
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    });
+
+    const page = await context.newPage();
+    const timeoutMs = (monitor.timeout_seconds || 15) * 1000;
+
+    // Navigasi ke URL target
+    const response = await page.goto(monitor.target, { timeout: timeoutMs, waitUntil: 'domcontentloaded' });
+    
+    const responseTimeMs = Date.now() - startTime;
+    const statusCode = response ? response.status() : 0;
+
+    // 403 atau 200 dianggap up untuk web yang punya WAF/Self-signed
+    if (!response || (statusCode >= 400 && statusCode < 600 && statusCode !== 403)) {
+      await browser.close();
+      return {
+        status: 'down',
+        responseTimeMs,
+        statusCode,
+        errorMessage: `Browser load failed: HTTP ${statusCode}`
+      };
+    }
+
+    // Optional Keyword matching logic inside the rendered DOM
+    if (monitor.keyword_match && monitor.keyword_match.trim() !== '') {
+      const keyword = monitor.keyword_match.trim();
+      const content = await page.content();
+      const contains = content.includes(keyword);
+
+      if ((monitor.keyword_type === 'contains' && !contains) ||
+          (monitor.keyword_type === 'not_contains' && contains)) {
+        await browser.close();
+        return {
+          status: 'down',
+          responseTimeMs,
+          statusCode,
+          errorMessage: `Keyword Assertion Failed: ${keyword} (${monitor.keyword_type})`
+        };
+      }
+    }
+
+    await browser.close();
+    return {
+      status: 'up',
+      responseTimeMs,
+      statusCode
+    };
+
+  } catch (err: any) {
+    return {
+      status: 'down',
+      responseTimeMs: Date.now() - startTime,
+      errorMessage: `Browser Exception: ${err.message}`
+    };
+  }
+}
+
 /** Check if a monitor is covered by an active maintenance window */
 export function isUnderMaintenance(monitorId: string): boolean {
   try {
@@ -378,12 +499,33 @@ export async function executeCheck(monitor: MonitorRecord): Promise<void> {
   if (monitor.type === 'push') {
     result = checkPushHeartbeat(monitor);
     if (result.status === ('pending' as any)) return;
+  } else if (monitor.type === 'browser') {
+    result = await probeBrowser(monitor);
   } else if (monitor.type === 'dns') {
     result = await probeDns(monitor);
-  } else if (monitor.type === 'tcp' || monitor.type === 'ping') {
+  } else if (monitor.type === 'ping') {
+    result = await probePing(monitor);
+  } else if (monitor.type === 'tcp') {
     result = await probeTcp(monitor);
   } else {
     result = await probeHttp(monitor);
+  }
+
+  // Jika monitor adalah browser dan SSL check aktif, gabungkan logic SSL expiry-nya
+  if (monitor.type === 'browser' && monitor.ssl_check_enabled && monitor.target.startsWith('https://')) {
+    try {
+      const parsed = new URL(monitor.target);
+      const sslDaysRemaining = await checkSslCertificate(parsed.hostname, parsed.port ? parseInt(parsed.port) : 443, 8000);
+      result.sslDaysRemaining = sslDaysRemaining;
+
+      if (sslDaysRemaining !== undefined && sslDaysRemaining <= 0) {
+        result.status = 'down';
+        result.errorMessage = `SSL Certificate Expired! (-${Math.abs(sslDaysRemaining)} days)`;
+      } else if (sslDaysRemaining !== undefined && sslDaysRemaining < (monitor.ssl_expiry_alert_days || 14)) {
+        result.status = 'down';
+        result.errorMessage = `SSL Certificate expires soon (${sslDaysRemaining} days remaining)`;
+      }
+    } catch {}
   }
 
   const nowIso = new Date().toISOString();
@@ -544,7 +686,32 @@ export async function executeCheck(monitor: MonitorRecord): Promise<void> {
 
 // Background Scheduler Loop
 let schedulerTimer: NodeJS.Timeout | null = null;
+let apiSyncTimer: NodeJS.Timeout | null = null;
 let isRunning = false;
+
+async function checkApiSyncJobs() {
+  try {
+    const integrations = db.prepare('SELECT * FROM api_integrations WHERE auto_sync = 1').all() as any[];
+    const now = Date.now();
+
+    for (const integ of integrations) {
+      const lastSynced = integ.last_synced_at ? new Date(integ.last_synced_at).getTime() : 0;
+      const intervalMs = (integ.sync_interval_hours || 168) * 3600 * 1000;
+
+      if (now - lastSynced >= intervalMs) {
+        console.log(`🔄 Menjalankan Auto-Sync API: ${integ.name} (${integ.api_url})`);
+        try {
+          const res = await processApiSync(integ.api_url, integ.default_interval_seconds || 60, integ.id);
+          console.log(`✅ Auto-Sync Selesai: +${res.addedCount} baru, ${res.updatedCount} terupdate.`);
+        } catch (syncErr) {
+          console.error(`❌ Gagal Auto-Sync API ${integ.name}:`, syncErr);
+        }
+      }
+    }
+  } catch (err) {
+    console.error('API Sync check error:', err);
+  }
+}
 
 export function startMonitoringEngine() {
   if (isRunning) return;
@@ -578,12 +745,20 @@ export function startMonitoringEngine() {
   // Run tick every 2 seconds
   schedulerTimer = setInterval(tick, 2000);
   tick(); // immediate first tick
+
+  // Run API Sync check every 5 minutes
+  apiSyncTimer = setInterval(checkApiSyncJobs, 5 * 60 * 1000);
+  checkApiSyncJobs(); // check on startup
 }
 
 export function stopMonitoringEngine() {
   if (schedulerTimer) {
     clearInterval(schedulerTimer);
     schedulerTimer = null;
+  }
+  if (apiSyncTimer) {
+    clearInterval(apiSyncTimer);
+    apiSyncTimer = null;
   }
   isRunning = false;
   console.log('⏹️ SentinelUp Monitoring Engine stopped.');
