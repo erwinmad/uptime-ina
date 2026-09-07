@@ -13,7 +13,7 @@
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-full bg-zinc-100 ring-1 ring-zinc-200 flex items-center justify-center text-base shrink-0">
             <img v-if="isImageLogo(statusData?.branding?.logo_icon)" :src="statusData?.branding?.logo_icon" alt="Logo" class="w-5 h-5 object-contain rounded-full" />
-            <span v-else class="text-sm">{{ statusData?.branding?.logo_icon || '🌐' }}</span>
+            <span v-else class="text-sm" :class="{ 'animate-detak': (statusData?.branding?.logo_icon || '💓') === '💓' }">{{ statusData?.branding?.logo_icon || '💓' }}</span>
           </div>
           <div>
             <h1 class="text-sm font-bold tracking-tight text-zinc-900">{{ statusData?.page?.title || statusData?.branding?.app_name || 'Status Layanan' }}</h1>
@@ -27,6 +27,7 @@
             <span>{{ t('nav.liveObservability') }}</span>
           </div>
           
+          <DarkModeToggle />
           <LanguageSwitcher />
           <button 
             @click="isSubscribeModalOpen = true"
@@ -486,7 +487,7 @@
     <!-- Clean Flat Modern Footer -->
     <footer class="w-full border-t border-zinc-200/80 py-6 mt-8 bg-white/50">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-zinc-400 font-mono">
-        <p>{{ statusData?.branding?.footer_text || 'Powered by SentinelUp — Observability Platform' }}</p>
+        <p><span>{{ statusData?.branding?.footer_text || 'Powered by deTAK — Observability Platform' }}</span></p><div class="flex items-center gap-2 flex-wrap"><a href="https://github.com/erwinmad/uptime-ina" target="_blank" rel="noopener" class="inline-flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-2">GitHub ↗</a><span class="opacity-30">·</span><span>© 2026 deTAK</span></div>
         <div>
           <a href="/login" class="text-zinc-600 hover:text-zinc-900 font-sans text-xs transition-colors">Akses Operator →</a>
         </div>
@@ -501,6 +502,7 @@ import ToastContainer from './ToastContainer.vue';
 import { setToastRef, useToast } from './useToast.js';
 import { useI18n } from '../../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher.vue';
+import DarkModeToggle from './DarkModeToggle.vue';
 const { t, locale } = useI18n();
 
 const props = defineProps({

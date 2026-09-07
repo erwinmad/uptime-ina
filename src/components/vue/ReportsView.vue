@@ -393,7 +393,7 @@
     <footer class="w-full border-t border-zinc-200/80 py-6 bg-white/50 print:block mt-auto">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-zinc-400 font-mono">
         <p>{{ t('common.loading') }}: {{ generatedDateStr }}</p>
-        <p>{{ branding.footer_text || 'Powered by SentinelUp — Observability Platform' }}</p>
+        <p><span>{{ branding.footer_text || 'Powered by deTAK — Observability Platform' }}</span></p><div class="flex items-center gap-2 flex-wrap"><a href="https://github.com/erwinmad/uptime-ina" target="_blank" rel="noopener" class="inline-flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-2">GitHub ↗</a><span class="opacity-30">·</span><span>© 2026 deTAK</span></div>
       </div>
     </footer>
   </div>
@@ -414,9 +414,9 @@ const props = defineProps({
 });
 
 const branding = ref({
-  app_name: 'Uptime CJR',
-  app_tagline: 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur',
-  footer_text: '© 2026 Uptime CJR — Dinas Komunikasi dan Informatika Kab. Cianjur',
+  app_name: 'deTAK',
+  app_tagline: 'Platform Observabilitas & Pemantauan Ketersediaan Layanan',
+  footer_text: 'Powered by deTAK — Uptime & Observability Platform',
   logo_icon: '🌐'
 });
 
@@ -464,18 +464,18 @@ const filteredMonitors = computed(() => {
 const sortedMonitors = computed(() => {
   const arr = [...filteredMonitors.value];
   arr.sort((a,b) => {
-    // Featured selalu paling atas terlepas dari sort field lain, kecuali sortField == featured maka murni featured
-    if (sortField.value !== 'featured') {
-      if (a.is_featured !== b.is_featured) return b.is_featured ? 1 : -1;
+    // Inactive selalu paling bawah: featured (active) → non-featured (active) → nonaktif
+    const prio = (m) => !m.active ? 2 : (m.is_featured ? 0 : 1);
+    const pa = prio(a), pb = prio(b);
+    if (pa !== pb) return pa - pb;
+    if (sortField.value === 'featured') {
+      return sortDir.value === 'desc' ? (b.is_featured?1:0) - (a.is_featured?1:0) : (a.is_featured?1:0) - (b.is_featured?1:0);
     }
     let av = a[sortField.value];
     let bv = b[sortField.value];
     if (sortField.value === 'name' || sortField.value === 'category_name') {
       av = String(av||'').toLowerCase(); bv = String(bv||'').toLowerCase();
       return sortDir.value === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
-    }
-    if (sortField.value === 'featured') {
-      return sortDir.value === 'desc' ? (b.is_featured?1:0) - (a.is_featured?1:0) : (a.is_featured?1:0) - (b.is_featured?1:0);
     }
     av = Number(av||0); bv = Number(bv||0);
     return sortDir.value === 'asc' ? av - bv : bv - av;

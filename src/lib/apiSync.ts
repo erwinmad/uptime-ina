@@ -77,7 +77,7 @@ export async function processApiSync(apiUrl: string, defaultIntervalSeconds = 36
   `);
   const updateStmt = db.prepare(`
     UPDATE monitors 
-    SET name = ?, category_name = COALESCE(?, category_name), active = ?, expected_status_codes = '[200, 201, 301, 302, 403]', updated_at = datetime('now')
+    SET name = ?, category_name = COALESCE(?, category_name), active = ?, interval_seconds = ?, expected_status_codes = '[200, 201, 301, 302, 403]', updated_at = datetime('now')
     WHERE id = ?
   `);
 
@@ -115,8 +115,8 @@ export async function processApiSync(apiUrl: string, defaultIntervalSeconds = 36
     const existing = checkStmt.get(url, url, url, url) as any;
 
     if (existing) {
-      // Update name/category/is_active if changed
-      updateStmt.run(name, category, isActive, existing.id);
+      // Update name/category/is_active + interval if changed (fix: previously interval was not updated, causing 60s stuck)
+      updateStmt.run(name, category, isActive, defaultIntervalSeconds, existing.id);
       updatedCount++;
       processedItems.push({
         name,

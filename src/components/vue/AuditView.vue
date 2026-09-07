@@ -74,7 +74,7 @@
       </div>
     </div>
     <footer class="w-full border-t border-zinc-200/80 py-6 bg-white/50 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 text-[11px] text-zinc-400 font-mono">{{ t('audit.footer') }}</div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 text-[11px] text-zinc-400 font-mono flex items-center justify-between gap-2 flex-wrap"><span>{{ t('audit.footer') }}</span><span class="flex items-center gap-2"><a href="https://github.com/erwinmad/uptime-ina" target="_blank" rel="noopener" class="hover:text-zinc-600 underline">GitHub ↗</a><span class="opacity-30">·</span><span>© 2026 deTAK</span></span></div>
     </footer>
   </div>
 </template>

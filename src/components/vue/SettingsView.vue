@@ -126,10 +126,10 @@
             <span class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">{{ t('settings.brandingForm.templateLabel') }}</span>
             <div class="flex flex-wrap gap-2">
               <button type="button" class="px-2.5 py-1 text-xs rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-700 border border-zinc-300 transition-colors" @click="applyPreset('cjr')">
-                🌐 Uptime CJR (Diskominfo)
+                💓 deTAK (Default)
               </button>
               <button type="button" class="px-2.5 py-1 text-xs rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-700 border border-zinc-300 transition-colors" @click="applyPreset('sentinel')">
-                <ShieldCheck class="w-3.5 h-3.5" /> SentinelUp (Default)
+                <ShieldCheck class="w-3.5 h-3.5" /> deTAK Enterprise
               </button>
               <button type="button" class="px-2.5 py-1 text-xs rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-700 border border-zinc-300 transition-colors" @click="applyPreset('cloud')">
                 ⚡ CloudOps Monitor
@@ -161,22 +161,39 @@
               <span class="block text-[11px] text-zinc-400">{{ t('settings.brandingForm.taglineDesc') }}</span>
             </div>
 
-            <!-- Logo / Ikon -->
+            <!-- Logo / Ikon — deTAK pulse + upload/URL -->
             <div class="space-y-1">
-              <label class="block text-xs font-medium text-zinc-600">{{ t('settings.brandingForm.logoLabel') }}</label>
-              <input 
-                v-model="brandingForm.logo_icon" 
-                class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 focus:bg-white" 
-                :placeholder="t('settings.brandingForm.logoPlaceholder')" 
-                required 
-              />
+              <label class="block text-xs font-medium text-zinc-600">{{ t('settings.brandingForm.logoLabel') }} <span class="ml-1 inline-flex items-center gap-1 text-rose-500"><span class="animate-detak">💓</span> deTAK</span></label>
+              <div class="flex gap-2">
+                <input 
+                  v-model="brandingForm.logo_icon" 
+                  class="flex-1 bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 focus:bg-white" 
+                  :placeholder="t('settings.brandingForm.logoPlaceholder')" 
+                  required 
+                />
+                <label class="px-3 py-2.5 rounded-xl text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-100 border border-zinc-200 cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0">
+                  <Upload class="w-3.5 h-3.5" /> Upload
+                  <input ref="logoFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif,image/x-icon,.png,.jpg,.jpeg,.webp,.svg,.gif,.ico" class="hidden" @change="handleLogoUpload" />
+                </label>
+              </div>
+              <div v-if="isUploadingLogo" class="text-[11px] text-zinc-500 font-mono flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-zinc-200 border-t-zinc-900 rounded-full animate-spin"></span> Mengunggah logo...</div>
+              <div v-if="brandingForm.logo_icon" class="flex items-center gap-2 p-2 bg-zinc-50 border border-zinc-200 rounded-xl">
+                <div class="w-8 h-8 rounded-lg bg-white border border-zinc-200 flex items-center justify-center overflow-hidden shrink-0">
+                  <img v-if="isImageLogo(brandingForm.logo_icon)" :src="brandingForm.logo_icon" alt="Preview" class="w-6 h-6 object-contain" />
+                  <span v-else class="text-sm" :class="{ 'animate-detak': brandingForm.logo_icon === '💓' }">{{ brandingForm.logo_icon }}</span>
+                </div>
+                <span class="text-[11px] text-zinc-500 font-mono truncate flex-1">{{ brandingForm.logo_icon }}</span>
+                <span v-if="brandingForm.logo_icon === '💓'" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-50 text-rose-600 border border-rose-200 animate-pulse">deTAK pulse</span>
+                <span v-else-if="isImageLogo(brandingForm.logo_icon)" class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-zinc-100 border border-zinc-200">URL ✓</span>
+              </div>
               <div class="flex items-center gap-1.5 pt-1">
                 <span class="text-[11px] text-zinc-400">{{ t('settings.brandingForm.quickIcon') }}</span>
                 <button 
-                  v-for="em in ['🌐', '🛡️', '⚡', '📡', '🏢', '🚀', '💻', '🔒', '📊']" 
+                  v-for="em in ['💓', '🌐', '🛡️', '⚡', '📡', '🏢', '🚀', '💻', '🔒']" 
                   :key="em" 
                   type="button" 
-                  class="w-7 h-7 flex items-center justify-center rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-sm border border-zinc-300 transition-colors"
+                  class="w-7 h-7 flex items-center justify-center rounded bg-white hover:bg-zinc-100 border border-zinc-200 text-sm transition-colors"
+                  :class="{ 'ring-1 ring-rose-200 bg-rose-50': em === '💓', 'animate-detak': em === '💓' }"
                   @click="brandingForm.logo_icon = em"
                 >
                   {{ em }}
@@ -236,7 +253,7 @@
                   <span v-else>{{ brandingForm?.logo_icon || '🌐' }}</span>
                 </div>
                 <div>
-                  <div class="text-xs font-bold text-zinc-900">{{ brandingForm?.app_name || 'Uptime CJR' }}</div>
+                  <div class="text-xs font-bold text-zinc-900">{{ brandingForm?.app_name || 'deTAK' }}</div>
                   <div class="text-[10px] text-zinc-500 truncate max-w-[160px]">{{ brandingForm?.app_tagline || 'Pemantauan Layanan' }}</div>
                 </div>
               </div>
@@ -255,7 +272,7 @@
                 <img v-if="brandingForm?.favicon_url && isImageLogo(brandingForm?.favicon_url)" :src="brandingForm?.favicon_url" class="w-4 h-4 rounded" />
                 <span v-else>{{ brandingForm?.logo_icon || '🌐' }}</span>
               </div>
-              <span class="text-xs text-zinc-700 truncate flex-1">{{ brandingForm?.app_name || 'Uptime CJR' }} — Dashboard</span>
+              <span class="text-xs text-zinc-700 truncate flex-1">{{ brandingForm?.app_name || 'deTAK' }} — Dashboard</span>
               <span class="text-zinc-400 text-xs">&times;</span>
             </div>
           </div>
@@ -264,7 +281,7 @@
           <div class="bg-white border border-zinc-200 rounded-xl p-4 space-y-2">
             <span class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">Footer Halaman:</span>
             <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-lg text-center text-xs text-zinc-500">
-              <p>{{ brandingForm?.footer_text || '© 2026 Uptime CJR — Pemantauan Layanan' }}</p>
+              <p>{{ brandingForm?.footer_text || 'Powered by deTAK — Uptime & Observability Platform' }}</p>
             </div>
           </div>
         </div>
@@ -361,7 +378,7 @@
       <!-- API Documentation -->
       <div class="mt-8 p-5 bg-white border border-zinc-200 rounded-2xl space-y-4">
         <div>
-          <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">📚 Dokumentasi API — Uptime CJR</h3>
+          <h3 class="text-sm font-bold text-zinc-900 flex items-center gap-2">📚 Dokumentasi API — deTAK</h3>
           <p class="text-[11px] text-zinc-500 mt-1">Gunakan API Keys di atas untuk autentikasi. Semua endpoint berada di bawah <code class="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 rounded text-[10px] font-mono">/api/v1</code> dengan header <code class="px-1.5 py-0.5 bg-zinc-100 border border-zinc-200 rounded text-[10px] font-mono">Authorization: Bearer sk_live_xxx</code></p>
         </div>
 
@@ -704,6 +721,7 @@
                 <div class="space-y-1">
                   <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Jadwal Auto-Sync</label>
                   <select v-model="apiSyncForm.sync_interval_hours" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-400">
+                    <option :value="1">Setiap 1 Jam (1 Jam)</option>
                     <option :value="24">Setiap Hari (24 Jam)</option>
                     <option :value="168">Setiap 1 Minggu (7 Hari)</option>
                     <option :value="720">Setiap 1 Bulan (30 Hari)</option>
@@ -889,7 +907,7 @@
     <section v-if="currentTab === 'security'" class="space-y-3">
       <div>
         <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><Shield class="w-4 h-4" /> Keamanan Akun & Akses</span></h2>
-        <p class="text-xs text-zinc-500 mt-0.5">Kelola kata sandi akun operator administrator SentinelUp.</p>
+        <p class="text-xs text-zinc-500 mt-0.5">Kelola kata sandi akun operator administrator deTAK.</p>
       </div>
 
       <div v-if="pwdSuccessMsg" class="p-3 bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs font-medium flex items-center justify-between">
@@ -1048,7 +1066,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-sm font-semibold text-zinc-900">👥 Manajemen Tim Operator &amp; Hak Akses (RBAC)</h2>
-          <p class="text-xs text-zinc-500 mt-0.5">Kelola akun operator dan tingkat hak akses ke SentinelUp. Registrasi publik dinonaktifkan demi keamanan.</p>
+          <p class="text-xs text-zinc-500 mt-0.5">Kelola akun operator dan tingkat hak akses ke deTAK. Registrasi publik dinonaktifkan demi keamanan.</p>
         </div>
         <button class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-xs cursor-pointer" @click="isUserModalOpen = true">
           + Tambah Operator
@@ -1174,7 +1192,7 @@
     <section v-if="currentTab === 'backup'" class="space-y-3">
       <div>
         <h2 class="text-sm font-semibold text-zinc-900"><span class="inline-flex items-center gap-1.5"><HardDrive class="w-4 h-4" /> Backup Database &amp; Ekspor Konfigurasi</span></h2>
-        <p class="text-xs text-zinc-500 mt-0.5">Unduh snapshot database lengkap atau ekspor konfigurasi SentinelUp dalam format JSON untuk arsip dan pemulihan cepat.</p>
+        <p class="text-xs text-zinc-500 mt-0.5">Unduh snapshot database lengkap atau ekspor konfigurasi deTAK dalam format JSON untuk arsip dan pemulihan cepat.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1664,7 +1682,7 @@
     <!-- Flat Modern Footer -->
     <footer class="w-full border-t border-zinc-200/80 py-6 bg-white/50 mt-auto">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-zinc-400 font-mono">
-        <p>{{ brandingForm.footer_text || 'Powered by SentinelUp — Observability Platform' }}</p>
+        <p><span>{{ brandingForm.footer_text || 'Powered by deTAK — Observability Platform' }}</span></p><div class="flex items-center gap-2 flex-wrap"><a href="https://github.com/erwinmad/uptime-ina" target="_blank" rel="noopener" class="hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-2">GitHub ↗</a><span class="opacity-30">·</span><span>© 2026 deTAK</span></div>
       </div>
     </footer>
   </div>
@@ -1672,7 +1690,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { Palette, Bell, Zap, Headset, Wrench, Satellite, Shield, KeyRound, HardDrive, Package, RefreshCw, Settings, Eye, Send, Gamepad2, MessageCircle, Globe, PartyPopper, Copy, Clipboard, CircleDot, FileUp, FolderUp, Lock, Save, Sparkles, ShieldCheck } from 'lucide-vue-next';
+import { Palette, Bell, Zap, Headset, Wrench, Satellite, Shield, KeyRound, HardDrive, Package, RefreshCw, Settings, Eye, Send, Gamepad2, MessageCircle, Globe, PartyPopper, Copy, Clipboard, CircleDot, FileUp, FolderUp, Lock, Save, Sparkles, ShieldCheck, Upload } from 'lucide-vue-next';
 import AppNavbar from './AppNavbar.vue';
 import LanguageSwitcher from './LanguageSwitcher.vue';
 import ConfirmModal from './ConfirmModal.vue';
@@ -1719,26 +1737,28 @@ const keyForm = ref({ name: '', scopes: ['*'] });
 // Branding Whitelabel state
 const isSaving = ref(false);
 const saveSuccess = ref(false);
+const isUploadingLogo = ref(false);
+const logoFileInput = ref(null);
 const brandingForm = ref({
-  app_name: 'Uptime CJR',
-  app_tagline: 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur',
-  footer_text: '© 2026 Uptime CJR — Dinas Komunikasi dan Informatika Kab. Cianjur',
-  logo_icon: '🌐',
+  app_name: 'deTAK',
+  app_tagline: 'Platform Observabilitas & Pemantauan Ketersediaan Layanan',
+  footer_text: 'Powered by deTAK — Uptime & Observability Platform',
+  logo_icon: '💓',
   favicon_url: ''
 });
 
 function applyPreset(preset) {
   if (preset === 'cjr') {
-    brandingForm.value.app_name = 'Uptime CJR';
-    brandingForm.value.app_tagline = 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur';
-    brandingForm.value.footer_text = '© 2026 Uptime CJR — Dinas Komunikasi dan Informatika Kab. Cianjur';
-    brandingForm.value.logo_icon = '🌐';
+    brandingForm.value.app_name = 'deTAK';
+    brandingForm.value.app_tagline = 'Platform Observabilitas & Pemantauan Ketersediaan Layanan';
+    brandingForm.value.footer_text = 'Powered by deTAK — Uptime & Observability Platform';
+    brandingForm.value.logo_icon = '💓';
     brandingForm.value.favicon_url = '';
   } else if (preset === 'sentinel') {
-    brandingForm.value.app_name = 'SentinelUp';
+    brandingForm.value.app_name = 'deTAK Enterprise';
     brandingForm.value.app_tagline = 'Advanced Uptime & Observability';
-    brandingForm.value.footer_text = 'Powered by SentinelUp — High Availability Uptime & Observability';
-    brandingForm.value.logo_icon = '<ShieldCheck class="w-3.5 h-3.5" />';
+    brandingForm.value.footer_text = 'Powered by deTAK Enterprise — Uptime & Observability';
+    brandingForm.value.logo_icon = '💓';
     brandingForm.value.favicon_url = '';
   } else if (preset === 'cloud') {
     brandingForm.value.app_name = 'CloudOps Monitor';
@@ -1787,6 +1807,33 @@ async function saveBranding() {
   }
 }
 
+async function handleLogoUpload(event) {
+  const file = event.target?.files?.[0];
+  if (!file) return;
+  isUploadingLogo.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/v1/settings/branding/upload', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (res.ok && data.url) {
+      brandingForm.value.logo_icon = data.url;
+    } else {
+      console.error('Logo upload failed:', data.error);
+      alert(data.error || 'Gagal mengunggah logo');
+    }
+  } catch (err) {
+    console.error('Logo upload error:', err);
+    alert('Gagal mengunggah logo: ' + err.message);
+  } finally {
+    isUploadingLogo.value = false;
+    if (logoFileInput.value) logoFileInput.value.value = '';
+  }
+}
+
 // Custom Confirm Dialog state
 const confirmModal = ref({
   isOpen: false,
@@ -1827,7 +1874,7 @@ async function handleModalConfirm() {
 function resetBrandingDefaults() {
   openConfirmDialog({
     title: 'Reset Konfigurasi Branding',
-    message: 'Kembalikan seluruh konfigurasi identitas & branding ke standar default SentinelUp?',
+    message: 'Kembalikan seluruh konfigurasi identitas & branding ke standar default deTAK?',
     confirmText: 'Ya, Reset Default',
     isDanger: false,
     action: async () => {
@@ -2680,7 +2727,7 @@ async function submitApiSync() {
     if (res.ok) {
       apiSyncSuccessMsg.value = `Berhasil! ${data.result.addedCount} monitor ditambahkan, ${data.result.updatedCount} diupdate.`;
       isCreatingApiSync.value = false;
-      apiSyncForm.value = { name: '', api_url: '', sync_interval_hours: 168, default_interval_seconds: 60, auto_sync: true };
+      apiSyncForm.value = { name: '', api_url: '', sync_interval_hours: 168, default_interval_seconds: 3600, auto_sync: true };
       apiPreviewData.value = null;
       await fetchApiIntegrations();
       setTimeout(() => apiSyncSuccessMsg.value = '', 5000);

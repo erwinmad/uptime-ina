@@ -4,10 +4,10 @@
     <a href="/dashboard" class="flex items-center gap-3.5 group transition-opacity hover:opacity-90 shrink-0 min-w-0 max-w-[280px]">
       <div class="w-10 h-10 rounded-full bg-zinc-100 ring-1 ring-zinc-200/80 flex items-center justify-center text-lg shrink-0 shadow-2xs">
         <img v-if="isImageLogo(branding.logo_icon)" :src="branding.logo_icon" alt="Logo" class="w-5 h-5 object-contain rounded-full" />
-        <span v-else class="text-base">{{ branding.logo_icon || '🌐' }}</span>
+        <span v-else class="text-base" :class="{ 'animate-detak': branding.logo_icon === '💓' }">{{ branding.logo_icon || '💓' }}</span>
       </div>
       <div class="flex flex-col min-w-0">
-        <h1 class="text-sm font-bold text-zinc-900 tracking-tight leading-tight line-clamp-2 break-words">{{ branding.app_name || 'Uptime CJR' }}</h1>
+        <h1 class="text-sm font-bold text-zinc-900 tracking-tight leading-tight line-clamp-2 break-words">{{ branding.app_name || 'deTAK' }}</h1>
         <span class="text-[10px] text-zinc-500 font-medium uppercase tracking-wider mt-0.5 line-clamp-1 break-words">{{ subtitle || branding.app_tagline }}</span>
       </div>
     </a>
@@ -92,6 +92,9 @@
         <span>{{ isLive ? t('common.live') : t('common.off') }}</span>
       </div>
 
+      <!-- Dark Toggle — pisah light/dark -->
+      <DarkModeToggle />
+
       <!-- Language Switcher -->
       <LanguageSwitcher />
 
@@ -122,6 +125,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { Activity, AlertTriangle, BarChart3, Globe, Settings, ScrollText } from 'lucide-vue-next';
 import LanguageSwitcher from './LanguageSwitcher.vue';
+import DarkModeToggle from './DarkModeToggle.vue';
 import { useI18n } from '../../lib/i18n';
 const { t } = useI18n();
 
@@ -166,9 +170,9 @@ const currentActiveTab = computed(() => {
 });
 
 const branding = ref({
-  app_name: 'Uptime CJR',
-  app_tagline: 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur',
-  logo_icon: '🌐'
+  app_name: 'deTAK',
+  app_tagline: 'Platform Observabilitas & Pemantauan Ketersediaan Layanan',
+  logo_icon: '💓'
 });
 
 function isImageLogo(url) {

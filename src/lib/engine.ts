@@ -701,7 +701,7 @@ async function checkApiSyncJobs() {
       if (now - lastSynced >= intervalMs) {
         console.log(`🔄 Menjalankan Auto-Sync API: ${integ.name} (${integ.api_url})`);
         try {
-          const res = await processApiSync(integ.api_url, integ.default_interval_seconds || 60, integ.id);
+          const res = await processApiSync(integ.api_url, integ.default_interval_seconds || 3600, integ.id);
           console.log(`✅ Auto-Sync Selesai: +${res.addedCount} baru, ${res.updatedCount} terupdate.`);
         } catch (syncErr) {
           console.error(`❌ Gagal Auto-Sync API ${integ.name}:`, syncErr);
@@ -716,7 +716,7 @@ async function checkApiSyncJobs() {
 export function startMonitoringEngine() {
   if (isRunning) return;
   isRunning = true;
-  console.log('🚀 SentinelUp Monitoring Engine started.');
+  console.log('🚀 deTAK Monitoring Engine started.');
 
   const tick = async () => {
     try {
@@ -761,5 +761,5 @@ export function stopMonitoringEngine() {
     apiSyncTimer = null;
   }
   isRunning = false;
-  console.log('⏹️ SentinelUp Monitoring Engine stopped.');
+  console.log('⏹️ deTAK Monitoring Engine stopped.');
 }

@@ -28,26 +28,26 @@ export const GET: APIRoute = async () => {
       const cleanName = m.name.replace(/"/g, '\\"');
       const cleanTarget = m.target.replace(/"/g, '\\"');
       const lat = lastCheck ? lastCheck.response_time_ms : 0;
-      latencyLines += `sentinelup_monitor_latency_ms{id="${m.id}",name="${cleanName}",target="${cleanTarget}"} ${lat}\n`;
+      latencyLines += `detak_monitor_latency_ms{id="${m.id}",name="${cleanName}",target="${cleanTarget}"} ${lat}\n`;
     }
 
     const metricsText = `
-# HELP sentinelup_monitors_total Total number of active monitors by status
-# TYPE sentinelup_monitors_total gauge
-sentinelup_monitors_total{status="up"} ${upCount}
-sentinelup_monitors_total{status="down"} ${downCount}
-sentinelup_monitors_total{status="paused"} ${pausedCount}
+# HELP detak_monitors_total Total number of active monitors by status
+# TYPE detak_monitors_total gauge
+detak_monitors_total{status="up"} ${upCount}
+detak_monitors_total{status="down"} ${downCount}
+detak_monitors_total{status="paused"} ${pausedCount}
 
-# HELP sentinelup_checks_total Total number of checks recorded
-# TYPE sentinelup_checks_total counter
-sentinelup_checks_total ${checksCount.count}
+# HELP detak_checks_total Total number of checks recorded
+# TYPE detak_checks_total counter
+detak_checks_total ${checksCount.count}
 
-# HELP sentinelup_active_incidents_total Total number of currently active incidents
-# TYPE sentinelup_active_incidents_total gauge
-sentinelup_active_incidents_total ${incidentsCount.count}
+# HELP detak_active_incidents_total Total number of currently active incidents
+# TYPE detak_active_incidents_total gauge
+detak_active_incidents_total ${incidentsCount.count}
 
-# HELP sentinelup_monitor_latency_ms Latest latency in milliseconds per monitor
-# TYPE sentinelup_monitor_latency_ms gauge
+# HELP detak_monitor_latency_ms Latest latency in milliseconds per monitor
+# TYPE detak_monitor_latency_ms gauge
 ${latencyLines}
 `.trim();
 

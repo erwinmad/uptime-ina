@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     // Generate secret baru jika belum aktif
     const secret = generateSecret();
     const otpauth = generateURI({
-      issuer: 'Uptime CJR',
+      issuer: 'deTAK',
       label: user.email,
       secret
     });

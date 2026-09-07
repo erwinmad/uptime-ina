@@ -38,7 +38,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         status: 200,
         headers: {
           'Content-Type': 'application/x-sqlite3',
-          'Content-Disposition': `attachment; filename="sentinelup-backup-${dateStr}.db"`,
+          'Content-Disposition': `attachment; filename="detak-backup-${dateStr}.db"`,
           'Content-Length': fileBuffer.length.toString()
         }
       });
@@ -71,7 +71,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Content-Disposition': `attachment; filename="sentinelup-export-${dateStr}.json"`
+        'Content-Disposition': `attachment; filename="detak-export-${dateStr}.json"`
       }
     });
   } catch (err: any) {

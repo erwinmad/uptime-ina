@@ -297,7 +297,7 @@
     <!-- Footer Flat Bottom -->
     <footer class="w-full border-t border-zinc-200/80 py-6 bg-white/50 mt-auto">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-zinc-400 font-mono">
-        <p>{{ branding.footer_text || 'Powered by SentinelUp — Observability Platform' }}</p>
+        <p><span>{{ branding.footer_text || 'Powered by deTAK — Observability Platform' }}</span></p><div class="flex items-center gap-2 flex-wrap"><a href="https://github.com/erwinmad/uptime-ina" target="_blank" rel="noopener" class="inline-flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-2">GitHub ↗</a><span class="opacity-30">·</span><span>© 2026 deTAK</span></div>
       </div>
     </footer>
   </div>
@@ -331,10 +331,10 @@ async function handleLogout() {
 const incidents = ref([]);
 const monitors = ref([]);
 const branding = ref({
-  app_name: 'Uptime CJR',
-  app_tagline: 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur',
+  app_name: 'deTAK',
+  app_tagline: 'Platform Observabilitas & Pemantauan Ketersediaan Layanan',
   logo_icon: '🌐',
-  footer_text: '© 2026 Uptime CJR — Sistem Pemantauan Ketersediaan Layanan'
+  footer_text: 'Powered by deTAK — Uptime & Observability Platform'
 });
 const statusFilter = ref('all');
 

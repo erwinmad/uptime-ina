@@ -49,6 +49,19 @@ const faviconHref = branding.favicon_url && branding.favicon_url.trim() !== ''
     <slot />
 
     <script is:inline>
+      // Init dark mode before paint — pisah light/dark (class strategy, localStorage, prefers-color-scheme)
+      try {
+        const savedTheme = localStorage.getItem('detak_theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : (prefersDark ? 'dark' : 'light');
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = theme;
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) metaTheme.content = theme === 'dark' ? '#09090B' : '#FAFAFA';
+        window.addEventListener('detak:theme-changed', (e) => {
+          if (metaTheme) metaTheme.content = e.detail === 'dark' ? '#09090B' : '#FAFAFA';
+        });
+      } catch {}
       // Init language from localStorage (bilingual ID/EN)
       try {
         const saved = localStorage.getItem('app_lang');

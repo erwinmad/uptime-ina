@@ -14,7 +14,7 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 
 async function start() {
-  console.log('🌟 Starting SentinelUp Platform...');
+  console.log('🌟 Starting deTAK Platform...');
 
   // 1. Seed demo monitors if table is empty
   const monitorCount = db.prepare('SELECT COUNT(*) as count FROM monitors').get() as { count: number };
@@ -52,7 +52,7 @@ async function start() {
         astroHandler(req, res);
       } else {
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end('<h1>SentinelUp is starting... please build the project.</h1>');
+        res.end('<h1>deTAK is starting... please build the project.</h1>');
       }
     });
   });
@@ -66,7 +66,7 @@ async function start() {
   // 7. Listen on port
   server.listen(PORT, HOST, () => {
     console.log(`\n======================================================`);
-    console.log(`🛡️  SentinelUp Platform is LIVE at: http://localhost:${PORT}`);
+    console.log(`🛡️  deTAK Platform is LIVE at: http://localhost:${PORT}`);
     console.log(`📊  Dashboard:    http://localhost:${PORT}/dashboard`);
     console.log(`🌐  Status Page:  http://localhost:${PORT}/status/main`);
     console.log(`📈  Prometheus:   http://localhost:${PORT}/api/metrics`);

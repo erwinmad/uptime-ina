@@ -38,8 +38,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Action: PREVIEW (Test Fetch)
     if (action === 'preview') {
       if (!api_url) return new Response(JSON.stringify({ error: 'URL API diperlukan' }), { status: 400 });
-      // Fetch test (dry run)
-      const res = await processApiSync(api_url, 60);
+      // Fetch test (dry run) — use 3600s default to match UI
+      const res = await processApiSync(api_url, 3600);
       return new Response(JSON.stringify(res), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
     
@@ -53,17 +53,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         db.prepare(`
           INSERT INTO api_integrations (id, name, api_url, sync_interval_hours, default_interval_seconds, auto_sync)
           VALUES (?, ?, ?, ?, ?, ?)
-        `).run(targetId, name, api_url, sync_interval_hours || 168, default_interval_seconds || 60, auto_sync ? 1 : 0);
+        `).run(targetId, name, api_url, sync_interval_hours || 168, default_interval_seconds || 3600, auto_sync ? 1 : 0);
       } else {
         db.prepare(`
           UPDATE api_integrations 
           SET name = ?, api_url = ?, sync_interval_hours = ?, default_interval_seconds = ?, auto_sync = ?
           WHERE id = ?
-        `).run(name, api_url, sync_interval_hours || 168, default_interval_seconds || 60, auto_sync ? 1 : 0, targetId);
+        `).run(name, api_url, sync_interval_hours || 168, default_interval_seconds || 3600, auto_sync ? 1 : 0, targetId);
       }
 
-      // Execute actual sync process now
-      const syncResult = await processApiSync(api_url, default_interval_seconds || 60, targetId);
+      // Execute actual sync process now — use 3600s default (1 jam) to match UI
+      const syncResult = await processApiSync(api_url, default_interval_seconds || 3600, targetId);
 
       return new Response(JSON.stringify({ success: true, integration_id: targetId, result: syncResult }), {
         status: 200,

@@ -10,10 +10,10 @@ const successMessage = ref('');
 
 // Branding data
 const branding = ref({
-  app_name: 'Uptime CJR',
-  app_tagline: 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur',
-  logo_icon: '🌐',
-  footer_text: '© 2026 Uptime CJR — Dinas Komunikasi dan Informatika'
+  app_name: 'deTAK',
+  app_tagline: 'Platform Observabilitas & Pemantauan Ketersediaan Layanan',
+  logo_icon: '💓',
+  footer_text: 'Powered by deTAK — Uptime & Observability Platform'
 });
 
 // Form state - Strictly login only
@@ -119,7 +119,7 @@ onMounted(() => {
             <img :src="branding.logo_icon" alt="Logo" class="w-7 h-7 object-contain rounded-full" />
           </template>
           <template v-else>
-            <span>{{ branding.logo_icon || '🌐' }}</span>
+            <span :class="{ 'animate-detak': (branding.logo_icon || '💓') === '💓' }">{{ branding.logo_icon || '💓' }}</span>
           </template>
         </div>
         <h1 class="text-xl font-bold tracking-tight text-zinc-900 mb-1.5">{{ branding.app_name }}</h1>
@@ -214,7 +214,7 @@ onMounted(() => {
           <span class="transition-transform duration-200 group-hover:-translate-x-1">←</span> Kembali ke Status Publik
         </a>
         <p class="text-[9px] font-mono text-zinc-400 uppercase tracking-widest">
-          {{ branding.footer_text }}
+          {{ branding.footer_text }} <span class="opacity-30">·</span> <a href="https://github.com/erwinmad/uptime-ina" target="_blank" rel="noopener" class="hover:text-zinc-600 underline">GitHub ↗</a>
         </p>
       </div>
       

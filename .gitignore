@@ -7,3 +7,22 @@ dist/
 data/
 server.js
 .DS_Store
+
+# SaaS user uploads — jangan commit file upload branding (keep .gitkeep)
+public/uploads/
+!public/uploads/branding/.gitkeep
+
+# Logs & OS
+*.log
+npm-debug.log*
+pnpm-debug.log*
+coverage/
+.turbo/
+.vercel/
+*.tsbuildinfo
+
+# DB artifacts (sudah cover data/, tapi jaga-jaga untuk sqlite di root)
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*

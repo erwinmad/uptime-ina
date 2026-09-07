@@ -276,12 +276,12 @@ export function initDb() {
   if (orgCount.count === 0) {
     db.prepare(`
       INSERT INTO organizations (id, name, slug)
-      VALUES ('org-default', 'SentinelUp Default Org', 'default')
+      VALUES ('org-default', 'deTAK Default Org', 'default')
     `).run();
 
     db.prepare(`
       INSERT INTO status_pages (id, slug, title, description, is_public)
-      VALUES ('sp-default', 'main', 'SentinelUp System Status', 'Real-time uptime and incident report for all primary services', 1)
+      VALUES ('sp-default', 'main', 'deTAK System Status', 'Real-time uptime and incident report for all primary services', 1)
     `).run();
   }
 
@@ -289,10 +289,10 @@ export function initDb() {
   const settingCount = db.prepare('SELECT COUNT(*) as count FROM system_settings').get() as { count: number };
   if (settingCount.count === 0) {
     const seedSettings = [
-      ['app_name', 'Uptime CJR'],
-      ['app_tagline', 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur'],
-      ['footer_text', '© 2026 Uptime CJR — Dinas Komunikasi dan Informatika'],
-      ['logo_icon', '🌐'],
+      ['app_name', 'deTAK'],
+      ['app_tagline', 'Platform Observabilitas & Pemantauan Ketersediaan Layanan'],
+      ['footer_text', 'Powered by deTAK — Uptime & Observability Platform'],
+      ['logo_icon', '💓'],
       ['favicon_url', ''],
       ['primary_color', '#4f46e5']
     ];
@@ -328,9 +328,9 @@ export interface BrandingSettings {
 
 export function getBrandingSettings(): BrandingSettings {
   const defaults: BrandingSettings = {
-    app_name: 'Uptime CJR',
-    app_tagline: 'Sistem Pemantauan Ketersediaan Layanan & Infrastruktur',
-    footer_text: '© 2026 Uptime CJR — Dinas Komunikasi dan Informatika',
+    app_name: 'deTAK',
+    app_tagline: 'Platform Observabilitas & Pemantauan Ketersediaan Layanan',
+    footer_text: 'Powered by deTAK — Uptime & Observability Platform',
     logo_icon: '🌐',
     favicon_url: '',
     primary_color: '#4f46e5'
