@@ -304,9 +304,9 @@ export function initDb() {
   // Seed default admin user if empty (strictly no public registration)
   const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
   if (userCount.count === 0) {
-    const defaultEmail = (process.env.ADMIN_EMAIL || 'admin@cjr.go.id').toLowerCase();
-    const defaultPass = process.env.ADMIN_PASSWORD || 'Password123!';
-    const defaultName = 'Administrator Diskominfo';
+    const defaultEmail = (process.env.ADMIN_EMAIL || 'admin@detak.local').toLowerCase();
+    const defaultPass = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
+    const defaultName = 'Administrator';
     const hashed = hashPassword(defaultPass);
     const nowIso = new Date().toISOString();
     db.prepare(`
