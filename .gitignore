@@ -8,6 +8,9 @@ data/
 server.js
 .DS_Store
 
+# Docs lokal (tidak dipush)
+docs/
+
 # SaaS user uploads — jangan commit file upload branding (keep .gitkeep)
 public/uploads/
 !public/uploads/branding/.gitkeep
