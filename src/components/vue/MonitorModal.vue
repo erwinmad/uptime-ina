@@ -20,7 +20,7 @@
                 :class="form.type === 'http' ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/50'" 
                 @click="form.type = 'http'"
               >
-                🌐 HTTP
+                <span class="inline-flex items-center gap-1 justify-center"><Globe class="w-3.5 h-3.5" /> HTTP</span>
               </button>
               <button 
                 type="button" 
@@ -28,7 +28,7 @@
                 :class="form.type === 'browser' ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/50'" 
                 @click="form.type = 'browser'"
               >
-                🖥️ Browser
+                <span class="inline-flex items-center gap-1 justify-center"><Monitor class="w-3.5 h-3.5" /> Browser</span>
               </button>
               <button 
                 type="button" 
@@ -36,7 +36,7 @@
                 :class="form.type === 'tcp' ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/50'" 
                 @click="form.type = 'tcp'"
               >
-                🔌 TCP
+                <span class="inline-flex items-center gap-1 justify-center"><Plug class="w-3.5 h-3.5" /> TCP</span>
               </button>
               <button 
                 type="button" 
@@ -44,7 +44,7 @@
                 :class="form.type === 'dns' ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/50'" 
                 @click="form.type = 'dns'"
               >
-                🧭 DNS
+                <span class="inline-flex items-center gap-1 justify-center"><Compass class="w-3.5 h-3.5" /> DNS</span>
               </button>
               <button 
                 type="button" 
@@ -52,7 +52,7 @@
                 :class="form.type === 'ping' ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/50'" 
                 @click="form.type = 'ping'"
               >
-                📡 Ping
+                <span class="inline-flex items-center gap-1 justify-center"><Radio class="w-3.5 h-3.5" /> Ping</span>
               </button>
               <button 
                 type="button" 
@@ -60,7 +60,7 @@
                 :class="form.type === 'push' ? 'bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200' : 'text-zinc-500 hover:text-zinc-900 hover:bg-white/50'" 
                 @click="form.type = 'push'"
               >
-                💓 Push
+                <span class="inline-flex items-center gap-1 justify-center"><HeartPulse class="w-3.5 h-3.5" /> Push</span>
               </button>
             </div>
           </div>
@@ -265,6 +265,7 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue';
+import { Globe, Monitor, Plug, Compass, Radio, HeartPulse } from 'lucide-vue-next';
 import { useI18n } from '../../lib/i18n';
 const { t } = useI18n();
 

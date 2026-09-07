@@ -16,8 +16,8 @@
             <span v-else class="text-sm" :class="{ 'animate-detak': (statusData?.branding?.logo_icon || '💓') === '💓' }">{{ statusData?.branding?.logo_icon || '💓' }}</span>
           </div>
           <div>
-            <h1 class="text-sm font-bold tracking-tight text-zinc-900">{{ statusData?.page?.title || statusData?.branding?.app_name || 'Status Layanan' }}</h1>
-            <p v-if="statusData?.branding?.app_tagline" class="text-[11px] text-zinc-400 font-medium hidden sm:block">{{ statusData?.branding?.app_tagline }}</p>
+            <h1 class="text-sm font-bold tracking-tight text-zinc-900">{{ statusData?.page?.title || statusData?.branding?.app_name || t('public.serviceStatus') }}</h1>
+            <p v-if="statusData?.page?.description" class="text-[11px] text-zinc-400 font-medium hidden sm:block line-clamp-1">{{ statusData?.page?.description }}</p>
           </div>
         </div>
 
@@ -45,12 +45,12 @@
       <div v-if="isLocked" class="max-w-md mx-auto my-12 double-bezel animate-in fade-in duration-500">
         <div class="double-bezel-inner p-6 sm:p-8 text-center space-y-5">
           <div class="w-10 h-10 mx-auto rounded-full bg-zinc-100 ring-1 ring-zinc-200 flex items-center justify-center text-base">
-            🔒
+            <Lock class="w-5 h-5 text-zinc-500" />
           </div>
           <div>
-            <span class="inline-block rounded-full px-2.5 py-0.5 text-[9px] uppercase tracking-[0.15em] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 mb-2">Akses Terproteksi</span>
-            <h2 class="text-base font-bold text-zinc-900 tracking-tight">Halaman Status Terkunci</h2>
-            <p class="text-xs text-zinc-500 mt-1">Masukkan kata sandi untuk melihat metriks ketersediaan sistem.</p>
+            <span class="inline-block rounded-full px-2.5 py-0.5 text-[9px] uppercase tracking-[0.15em] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 mb-2">{{ t('public.protectedBadge') }}</span>
+            <h2 class="text-base font-bold text-zinc-900 tracking-tight">{{ t('public.protectedTitle') }}</h2>
+            <p class="text-xs text-zinc-500 mt-1">{{ t('public.protectedDesc') }}</p>
           </div>
           <div v-if="unlockError" class="p-2.5 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-mono">
             {{ unlockError }}
@@ -59,7 +59,7 @@
             <input 
               v-model="unlockPassword" 
               type="password" 
-              placeholder="Masukkan kata sandi..."
+              :placeholder="t('public.passwordPlaceholder')"
               class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:bg-white transition-all duration-200"
               required
             />
@@ -93,7 +93,7 @@
                 <div class="flex items-center justify-between">
                   <span class="text-[10px] uppercase font-bold tracking-wider"
                     :style="{ color: Number(averageUptime) >= 99 ? '#16a34a' : (Number(averageUptime) >= 90 ? '#d97706' : '#e11d48') }"
-                  >Status Sistem</span>
+                  >{{ t('public.systemStatus') }}</span>
                   <span class="w-2 h-2 rounded-full animate-pulse"
                     :style="{ background: Number(averageUptime) >= 99 ? '#22c55e' : (Number(averageUptime) >= 90 ? '#f59e0b' : '#f43f5e') }"
                   ></span>
@@ -106,13 +106,13 @@
                 <p class="text-[11px] leading-tight"
                   :style="{ color: Number(averageUptime) >= 99 ? '#15803d' : (Number(averageUptime) >= 90 ? '#b45309' : '#be123c') }"
                 >
-                  {{ downCount > 0 ? `${downCount} layanan mengalami kendala aktif` : 'Seluruh endpoint berjalan normal' }}
+                  {{ downCount > 0 ? t('public.activeIssues', {count: downCount}) : t('public.allEndpointsNormal') }}
                 </p>
               </div>
               <div class="pt-2 flex items-center justify-between text-[10px] font-mono"
                 :style="{ borderTop: '1px solid', borderColor: Number(averageUptime) >= 99 ? '#bbf7d080' : (Number(averageUptime) >= 90 ? '#fde68a80' : '#fecdd380'), color: '#9ca3af' }"
               >
-                <span>Sinkronisasi</span>
+                <span>{{ t('public.sync') }}</span>
                 <span class="font-medium" style="color: #374151">{{ lastUpdatedFormatted }}</span>
               </div>
             </div>
@@ -123,8 +123,8 @@
             <div class="double-bezel-inner h-full p-4 flex flex-col justify-between space-y-3">
               <div class="space-y-1.5">
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Ketersediaan (SLA 60h)</span>
-                  <span class="text-[11px]">📈</span>
+                  <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400">{{ t('public.availability') }}</span>
+                  <TrendingUp class="w-3.5 h-3.5 text-zinc-400" />
                 </div>
                 <div class="flex items-baseline gap-1.5">
                   <span class="text-xl sm:text-2xl font-black font-mono tracking-tight" 
@@ -157,8 +157,8 @@
             <div class="double-bezel-inner h-full p-4 flex flex-col justify-between space-y-3">
               <div class="space-y-1.5">
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Respon Rata-rata</span>
-                  <span class="text-[11px]">⚡</span>
+                  <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400">{{ t('public.avgResponseTitle') }}</span>
+                  <Zap class="w-3.5 h-3.5 text-zinc-400" />
                 </div>
                 <div class="flex items-baseline gap-1">
                   <span class="text-xl sm:text-2xl font-black font-mono tracking-tight text-zinc-900">
@@ -167,12 +167,12 @@
                   <span class="text-xs font-mono text-zinc-400">ms</span>
                 </div>
                 <p class="text-[11px] text-zinc-500 leading-tight">
-                  {{ avgResponseMs < 100 ? 'Kecepatan jaringan optimal' : 'Latensi dalam batas wajar' }}
+                  {{ avgResponseMs < 100 ? t('public.networkOptimal') : t('public.latencyNormal') }}
                 </p>
               </div>
               <div class="pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                <span>Toleransi Probe</span>
-                <span class="text-zinc-700 font-medium">Non-blocking</span>
+                <span>{{ t('public.tolerance') }}</span>
+                <span class="text-zinc-700 font-medium">{{ t('public.nonBlocking') }}</span>
               </div>
             </div>
           </div>
@@ -182,14 +182,14 @@
             <div class="double-bezel-inner h-full p-4 flex flex-col justify-between space-y-3">
               <div class="space-y-1.5">
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Total Endpoint</span>
-                  <span class="text-[11px]">🖥</span>
+                  <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400">{{ t('public.totalEndpointTitle') }}</span>
+                  <Server class="w-3.5 h-3.5 text-zinc-400" />
                 </div>
                 <div class="flex items-baseline gap-2">
                   <span class="text-xl sm:text-2xl font-black font-mono tracking-tight text-zinc-900">
                     {{ statusData?.monitors?.length || 0 }}
                   </span>
-                  <span class="text-[10px] text-zinc-400 font-mono">Aktif dipantau</span>
+                  <span class="text-[10px] text-zinc-400 font-mono">{{ t('public.activeMonitoring') }}</span>
                 </div>
                 <div class="flex items-center gap-2 text-[10px] font-mono pt-0.5">
                   <span class="text-emerald-600 font-semibold">✓ {{ upCount }} Up</span>
@@ -198,8 +198,8 @@
                 </div>
               </div>
               <div class="pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                <span>Interval</span>
-                <span class="text-zinc-700 font-medium">30-60 detik</span>
+                <span>{{ t('public.interval') }}</span>
+                <span class="text-zinc-700 font-medium">{{ intervalRange }}</span>
               </div>
             </div>
           </div>
@@ -212,7 +212,7 @@
         <section class="space-y-4">
           <div class="flex items-center justify-between px-1">
             <div class="flex items-center gap-2">
-              <span class="text-sm">💓</span>
+              <HeartPulse class="w-4 h-4 text-rose-500 animate-detak" />
               <h3 class="text-sm font-bold tracking-tight text-zinc-900">{{ t('public.heartbeatTitle') }}</h3>
             </div>
             <span class="text-[10px] font-mono text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">{{ t('public.history60Days') }}</span>
@@ -488,9 +488,6 @@
     <footer class="w-full border-t border-zinc-200/80 py-6 mt-8 bg-white/50">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-zinc-400 font-mono">
         <p><span>{{ statusData?.branding?.footer_text || 'Powered by deTAK — Observability Platform' }}</span></p><div class="flex items-center gap-2 flex-wrap"><a href="https://github.com/erwinmad/uptime-ina" target="_blank" rel="noopener" class="inline-flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-2">GitHub ↗</a><span class="opacity-30">·</span><span>© 2026 deTAK</span></div>
-        <div>
-          <a href="/login" class="text-zinc-600 hover:text-zinc-900 font-sans text-xs transition-colors">Akses Operator →</a>
-        </div>
       </div>
     </footer>
   </div>
@@ -498,6 +495,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { Activity, TrendingUp, Zap, Server, HeartPulse, Lock } from 'lucide-vue-next';
 import ToastContainer from './ToastContainer.vue';
 import { setToastRef, useToast } from './useToast.js';
 import { useI18n } from '../../lib/i18n';
@@ -577,20 +575,20 @@ const heroPulseClass = computed(() => {
 
 const heroBadgeText = computed(() => {
   if (systemState.value === 'operational') return t('public.normalOperational');
-  if (systemState.value === 'degraded') return 'Kinerja Terdegradasi';
+  if (systemState.value === 'degraded') return t('public.degradedBadge');
   return t('public.activeDisruption');
 });
 
 const heroTitle = computed(() => {
-  if (systemState.value === 'operational') return 'Semua Sistem & Endpoint Berjalan Normal';
-  if (systemState.value === 'degraded') return 'Sebagian Layanan Mengalami Degradasi';
+  if (systemState.value === 'operational') return t('public.heroOperationalTitle');
+  if (systemState.value === 'degraded') return t('public.heroDegradedTitle');
   return t('public.connectivityDetected');
 });
 
 const heroSubtitle = computed(() => {
-  if (systemState.value === 'operational') return 'Infrastruktur beroperasi dalam toleransi latensi dan ketersediaan optimal. Tidak ditemukan kendala aktif pada komponen inti.';
-  if (systemState.value === 'degraded') return 'Beberapa target mengalami peningkatan waktu respons atau kegagalan probe berkala. Tim teknis sedang melakukan investigasi.';
-  return 'Kegagalan koneksi terdeteksi pada simpul layanan utama. Penanganan darurat sedang diupayakan.';
+  if (systemState.value === 'operational') return t('public.heroOperationalSubtitle');
+  if (systemState.value === 'degraded') return t('public.heroDegradedSubtitle');
+  return t('public.heroDownSubtitle');
 });
 
 const monitorsByGroup = computed(() => {
@@ -659,8 +657,20 @@ function latencyColor(latency) {
 function intervalLabel(seconds) {
   if (!seconds) return '60s';
   if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+  if (seconds % 3600 === 0) return `${seconds / 3600}h`;
   return `${Math.round(seconds / 60)}m`;
 }
+
+const intervalRange = computed(() => {
+  const list = statusData.value?.monitors || [];
+  if (list.length === 0) return '—';
+  const vals = list.map(m => m.interval_seconds || 60);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  if (min === max) return intervalLabel(min);
+  return `${intervalLabel(min)} – ${intervalLabel(max)}`;
+});
 
 function statusLabel(status) {
   if (status === 'up') return t('public.operational');

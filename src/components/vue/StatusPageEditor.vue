@@ -237,6 +237,15 @@
         </div>
 
       </div>
+
+      <!-- Save Actions Bar — only when loaded -->
+      <div v-if="!loading" class="flex justify-end gap-3 p-4 bg-white ring-1 ring-zinc-200/80 rounded-2xl shadow-sm">
+        <a href="/status-pages" class="px-4 py-2 rounded-xl text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors">Batal</a>
+        <button @click="savePage" :disabled="isSaving || !form.title || !form.slug" class="px-6 py-2 rounded-xl text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm">
+          <span v-if="isSaving" class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          {{ isSaving ? 'Menyimpan...' : (isNew ? t('statusPages.create') : 'Simpan Perubahan') }}
+        </button>
+      </div>
     </div>
 
     <!-- Flat Modern Footer -->
@@ -254,6 +263,8 @@ import AppNavbar from './AppNavbar.vue';
 import { ref, computed, onMounted } from 'vue';
 import ToastContainer from './ToastContainer.vue';
 import { setToastRef, useToast } from './useToast.js';
+import { useI18n } from '../../lib/i18n';
+const { t } = useI18n();
 
 const props = defineProps({
   currentUser: {

@@ -172,11 +172,11 @@
                   required 
                 />
                 <label class="px-3 py-2.5 rounded-xl text-xs font-medium text-zinc-700 bg-white hover:bg-zinc-100 border border-zinc-200 cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0">
-                  <Upload class="w-3.5 h-3.5" /> Upload
+                  <Upload class="w-3.5 h-3.5" /> {{ t('settings.brandingForm.uploadBtn') }}
                   <input ref="logoFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif,image/x-icon,.png,.jpg,.jpeg,.webp,.svg,.gif,.ico" class="hidden" @change="handleLogoUpload" />
                 </label>
               </div>
-              <div v-if="isUploadingLogo" class="text-[11px] text-zinc-500 font-mono flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-zinc-200 border-t-zinc-900 rounded-full animate-spin"></span> Mengunggah logo...</div>
+              <div v-if="isUploadingLogo" class="text-[11px] text-zinc-500 font-mono flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-zinc-200 border-t-zinc-900 rounded-full animate-spin"></span> {{ t('settings.brandingForm.uploading') }}</div>
               <div v-if="brandingForm.logo_icon" class="flex items-center gap-2 p-2 bg-zinc-50 border border-zinc-200 rounded-xl">
                 <div class="w-8 h-8 rounded-lg bg-white border border-zinc-200 flex items-center justify-center overflow-hidden shrink-0">
                   <img v-if="isImageLogo(brandingForm.logo_icon)" :src="brandingForm.logo_icon" alt="Preview" class="w-6 h-6 object-contain" />
@@ -184,7 +184,7 @@
                 </div>
                 <span class="text-[11px] text-zinc-500 font-mono truncate flex-1">{{ brandingForm.logo_icon }}</span>
                 <span v-if="brandingForm.logo_icon === '💓'" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-50 text-rose-600 border border-rose-200 animate-pulse">deTAK pulse</span>
-                <span v-else-if="isImageLogo(brandingForm.logo_icon)" class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-zinc-100 border border-zinc-200">URL ✓</span>
+                <span v-else-if="isImageLogo(brandingForm.logo_icon)" class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-zinc-100 border border-zinc-200">{{ t('settings.brandingForm.urlValid') }}</span>
               </div>
               <div class="flex items-center gap-1.5 pt-1">
                 <span class="text-[11px] text-zinc-400">{{ t('settings.brandingForm.quickIcon') }}</span>
@@ -1823,11 +1823,11 @@ async function handleLogoUpload(event) {
       brandingForm.value.logo_icon = data.url;
     } else {
       console.error('Logo upload failed:', data.error);
-      alert(data.error || 'Gagal mengunggah logo');
+      alert(data.error || t('settings.brandingForm.uploadFailed'));
     }
   } catch (err) {
     console.error('Logo upload error:', err);
-    alert('Gagal mengunggah logo: ' + err.message);
+    alert(t('settings.brandingForm.uploadFailed') + ': ' + err.message);
   } finally {
     isUploadingLogo.value = false;
     if (logoFileInput.value) logoFileInput.value.value = '';
