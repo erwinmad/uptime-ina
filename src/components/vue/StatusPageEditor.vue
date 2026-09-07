@@ -229,7 +229,7 @@
               <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-100 text-xs font-mono text-zinc-600">
                 <span>Total Layanan Ditampilkan:</span>
                 <span class="font-bold text-zinc-900">
-                  {{ form.scope === 'all' ? allMonitors.length : totalSelectedMonitors }} Layanan
+                  {{ form.scope === 'all' ? allMonitors.filter(m => m.active).length : totalSelectedMonitors }} Layanan
                 </span>
               </div>
             </div>
@@ -295,15 +295,16 @@ const form = ref({
 
 function selectAll() {
   form.value.scope = 'select';
+  const activeIds = allMonitors.value.filter(m => m.active).map(m => m.id);
   if (form.value.monitor_groups.length === 0) {
     form.value.monitor_groups.push({
       group_name: 'Layanan Utama',
-      monitors: allMonitors.value.map(m => m.id)
+      monitors: activeIds
     });
   } else {
-    // Add all monitors to first group
+    // Add only active monitors to first group
     const firstGroup = form.value.monitor_groups[0];
-    firstGroup.monitors = allMonitors.value.map(m => m.id);
+    firstGroup.monitors = activeIds;
   }
 }
 
@@ -350,14 +351,14 @@ function getMonitorType(id) {
 }
 
 function availableMonitors(alreadySelected = []) {
-  // Ambil semua monitor ID yang sudah terpilih di grup MANAPUN di halaman status ini
+  // Ambil semua monitor ID yang sudah terpilih di grup MANAPUN di halaman status ini — hanya yang aktif
   const allUsedIds = new Set();
   for (const g of form.value.monitor_groups) {
     if (Array.isArray(g.monitors)) {
       g.monitors.forEach(id => allUsedIds.add(id));
     }
   }
-  return (allMonitors.value || []).filter(m => m && !allUsedIds.has(m.id));
+  return (allMonitors.value || []).filter(m => m && m.active && !allUsedIds.has(m.id));
 }
 
 const totalSelectedMonitors = computed(() => {
@@ -451,12 +452,12 @@ async function savePage() {
 
   isSaving.value = true;
   try {
-    // If scope === 'all', generate one group containing all monitors
+    // If scope === 'all', generate one group containing only active monitors
     let payloadGroups = [];
     if (form.value.scope === 'all') {
       payloadGroups = [{
         group_name: 'Layanan Utama',
-        monitors: allMonitors.value.map(m => m.id)
+        monitors: allMonitors.value.filter(m => m.active).map(m => m.id)
       }];
     } else {
       payloadGroups = form.value.monitor_groups;
